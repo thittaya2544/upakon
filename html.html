@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260709-05-e5cead5"}');</script>
+  <script src="/_sdk/f432b76fb310b513.telemetry_sdk.js" xintegrity="sha512-9FJQ55EKmmqhyyik8BhrMVfm0+iYYfb8uOlRsjtkxJMEI97qOVEI4PnHohDjQAtvAep0IOEpdQ64eki0sz62ug=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบทะเบียนยืม-คืนอุปกรณ์ รพ.สต.คลองจระเข้</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- เพิ่ม Library สำหรับสร้าง QR Code -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { primary: {50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',300:'#86efac',400:'#4ade80',500:'#22c55e',600:'#16a34a',700:'#15803d',800:'#166534',900:'#14532d'} } } }
+    }
+  </script>
+  <style>
+    body { font-family: 'Sarabun', sans-serif; }
+    .fade-in { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+    .sidebar-item { transition: all 0.15s ease; }
+    .sidebar-item:hover { transform: translateX(2px); }
+    .sidebar-item.active { background: #dcfce7; color: #15803d; font-weight: 600; }
+    .dark .sidebar-item.active { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+    .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
+    .toast { animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .eq-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb; cursor: pointer; }
+    .dark .eq-thumb { border-color: #475569; }
+    .eq-thumb-placeholder { width: 40px; height: 40px; border-radius: 6px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; background: #f9fafb; font-size: 18px; }
+    .dark .eq-thumb-placeholder { border-color: #475569; background: #334155; }
+    
+    @media print {
+        body:not(.printing-qr) #sidebar, body:not(.printing-qr) #menu-toggle, body:not(.printing-qr) .canva-header button, body:not(.printing-qr) .flex.gap-2 button { display: none !important; }
+        body:not(.printing-qr) .lg\:ml-56 { margin-left: 0 !important; }
+        body:not(.printing-qr) { background: white; }
+        
+        /* สไตล์สำหรับตอนปริ้นท์ QR Code */
+        body.printing-qr > :not(#modal) { display: none !important; }
+        body.printing-qr #modal { position: absolute; left: 0; top: 0; width: 100%; background: white; align-items: flex-start; justify-content: center; padding-top: 40px; display: flex !important; }
+        body.printing-qr #modal > div { box-shadow: none; border: none; max-height: none; width: 100%; max-width: none; background: transparent; }
+        body.printing-qr #modal-close, body.printing-qr #btn-print-qr, body.printing-qr #modal-title { display: none !important; }
+        body.printing-qr #qr-print-card { border: 2px dashed #ccc; transform: scale(1.2); transform-origin: top center; }
+    }
+  </style>
+  <script src="/_sdk/9432170dbd2ae0df.resizing_sdk.js" xintegrity="sha512-FeT+58sb1f9ejWPWFjCbJvTT+SDwGV+ngrHUnlO7TWEOoqwOLj6p256kO3vOL7DIWl1cIgrobiof8v2bOigwPg=="></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+</head>
+<body data-template-id="__page-root" class="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors">
+  <aside id="sidebar" class="fixed left-0 top-0 w-56 h-full bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform lg:translate-x-0 -translate-x-full overflow-y-auto">
+   <div class="p-4 border-b border-gray-200 dark:border-slate-700">
+    <h1 data-template-id="sidebar-title" class="canva-text text-sm font-bold text-primary-700 dark:text-primary-400 leading-tight">ระบบยืม-คืน รพ.สต.</h1>
+   </div>
+   <nav class="p-2 space-y-0.5" id="nav-menu">
+     <button data-page="dashboard" class="sidebar-item w-full text-left px-3 py-2 rounded-lg text-sm dark:text-gray-300">📊 Dashboard</button> 
+     <button data-page="equipment" class="sidebar-item w-full text-left px-3 py-2 rounded-lg text-sm dark:text-gray-300">📦 ทะเบียนอุปกรณ์</button> 
+     <button data-page="borrow" class="sidebar-item w-full text-left px-3 py-2 rounded-lg text-sm dark:text-gray-300">📝 ยืมอุปกรณ์</button> 
+     <button data-page="return" class="sidebar-item w-full text-left px-3 py-2 rounded-lg text-sm dark:text-gray-300">🔄 คืนอุปกรณ์</button> 
+     <button data-page="history" class="sidebar-item w-full text-left px-3 py-2 rounded-lg text-sm dark:text-gray-300">📋 ประวัติ</button> 
+     <button data-page="reports" class="sidebar-item w-full text-left px-3 py-2 rounded-lg text-sm dark:text-gray-300">📈 รายงาน</button> 
+     <button data-page="maintenance" class="sidebar-item w-full text-left px-3 py-2 rounded-lg text-sm dark:text-gray-300">🛠 ซ่อมบำรุง</button>
+   </nav>
+  </aside>
+  <button id="menu-toggle" class="lg:hidden fixed top-3 left-3 z-50 bg-primary-600 text-white p-2 rounded-lg shadow-lg" aria-label="เปิดเมนู">☰</button>
+  
+  <div class="lg:ml-56 min-h-screen">
+   <header data-template-id="header-section" class="canva-header sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-30 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+     <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/50 rounded-full flex items-center justify-center text-xl">🏥</div>
+     <div>
+      <h2 data-template-id="header-title" class="canva-text text-base font-bold text-gray-800 dark:text-gray-100">รพ.สต.คลองจระเข้</h2>
+      <p data-template-id="header-subtitle" class="canva-text text-xs text-gray-500 dark:text-gray-400">ระบบบริหารจัดการอุปกรณ์ทางการแพทย์</p>
+     </div>
+    </div>
+    <button id="dark-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700" aria-label="สลับโหมดมืด">🌓</button>
+   </header>
+   
+   <main class="p-4 md:p-5">
+    <!-- Dashboard -->
+    <section id="page-dashboard" class="page fade-in">
+     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <p class="text-xs text-gray-500 dark:text-gray-400">📦 อุปกรณ์ทั้งหมด</p>
+       <p id="stat-total" class="text-2xl font-bold text-gray-800 dark:text-white mt-1">0</p>
+      </div>
+      <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <p class="text-xs text-gray-500 dark:text-gray-400">🟢 พร้อมใช้งาน</p>
+       <p id="stat-available" class="text-2xl font-bold text-green-600 mt-1">0</p>
+      </div>
+      <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <p class="text-xs text-gray-500 dark:text-gray-400">🔴 กำลังถูกยืม</p>
+       <p id="stat-borrowed" class="text-2xl font-bold text-red-500 mt-1">0</p>
+      </div>
+      <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <p class="text-xs text-gray-500 dark:text-gray-400">🛠 ส่งซ่อม</p>
+       <p id="stat-maint" class="text-2xl font-bold text-orange-500 mt-1">0</p>
+      </div>
+     </div>
+     
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2 text-sm">📈 ยืม-คืนรายเดือน</h3>
+       <canvas id="chart-monthly" height="160"></canvas>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2 text-sm">📊 ประเภทอุปกรณ์</h3>
+       <canvas id="chart-category" height="160"></canvas>
+      </div>
+     </div>
+     
+     <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+      <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2 text-sm">📋 รายการยืม-คืนล่าสุด</h3>
+      <div class="overflow-x-auto">
+       <table class="w-full text-sm">
+        <thead>
+         <tr class="border-b border-gray-200 dark:border-slate-600 text-left text-gray-500 text-xs">
+          <th class="pb-2 pr-3">วันที่</th>
+          <th class="pb-2 pr-3">อุปกรณ์</th>
+          <th class="pb-2 pr-3">ผู้ยืม</th>
+          <th class="pb-2">สถานะ</th>
+         </tr>
+        </thead>
+        <tbody id="recent-table"></tbody>
+       </table>
+       <p id="no-recent" class="text-center text-gray-400 py-4 text-sm">ยังไม่มีรายการ</p>
+      </div>
+     </div>
+    </section>
+
+    <!-- Equipment -->
+    <section id="page-equipment" class="page fade-in hidden">
+     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <input id="eq-search" type="text" placeholder="🔍 ค้นหาชื่อ..." class="border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]">
+      <div class="flex gap-2">
+       <button id="btn-print-summary" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium">🖨️ พิมพ์</button> 
+       <button id="btn-add-eq" class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm font-medium">➕ เพิ่มอุปกรณ์</button>
+      </div>
+     </div>
+     <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm">
+       <thead>
+        <tr class="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600 text-left text-gray-600 dark:text-gray-300 text-xs">
+         <th class="px-3 py-2">ลำดับ</th>
+         <th class="px-3 py-2">รูป</th>
+         <th class="px-3 py-2">ชื่อ</th>
+         <th class="px-3 py-2">หมวด</th>
+         <th class="px-3 py-2 text-center">ทั้งหมด</th>
+         <th class="px-3 py-2 text-center">คงเหลือ</th>
+         <th class="px-3 py-2">สถานะ</th>
+         <th class="px-3 py-2">จัดการ</th>
+        </tr>
+       </thead>
+       <tbody id="eq-table"></tbody>
+      </table>
+      <p id="no-eq" class="text-center text-gray-400 py-5 text-sm">ยังไม่มีอุปกรณ์</p>
+     </div>
+    </section>
+
+    <!-- Borrow -->
+    <section id="page-borrow" class="page fade-in hidden">
+     <div class="max-w-xl mx-auto bg-white dark:bg-slate-800 rounded-xl p-5 border border-gray-100 dark:border-slate-700 shadow-sm">
+      <h3 class="text-base font-bold text-gray-800 dark:text-white mb-3">📝 แบบฟอร์มยืมอุปกรณ์</h3>
+      <form id="borrow-form" class="space-y-3">
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+         <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="borrow-name">👤 ชื่อ</label>
+         <input id="borrow-name" type="text" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm" required>
+        </div>
+        <div>
+         <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="borrow-surname">นามสกุล</label>
+         <input id="borrow-surname" type="text" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm" required>
+        </div>
+        <div class="md:col-span-2">
+         <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="borrow-equipment">📦 อุปกรณ์ที่ต้องการยืม</label>
+         <select id="borrow-equipment" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm" required></select>
+        </div>
+        <div>
+         <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="borrow-date">📅 วันที่ยืม</label>
+         <input id="borrow-date" type="date" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm" required>
+        </div>
+       </div>
+       <div>
+        <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="borrow-notes">📝 หมายเหตุ</label>
+        <textarea id="borrow-notes" rows="2" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm"></textarea>
+       </div>
+       <button type="submit" id="borrow-submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium text-sm transition">💾 บันทึกการยืม</button>
+      </form>
+      <div id="borrow-success" class="hidden mt-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 text-green-700 dark:text-green-300 text-center text-sm">
+       ✅ บันทึกการยืมสำเร็จ!
+      </div>
+     </div>
+    </section>
+
+    <!-- Return -->
+    <section id="page-return" class="page fade-in hidden">
+     <div class="max-w-xl mx-auto bg-white dark:bg-slate-800 rounded-xl p-5 border border-gray-100 dark:border-slate-700 shadow-sm">
+      <h3 class="text-base font-bold text-gray-800 dark:text-white mb-3">🔄 คืนอุปกรณ์ (กำลังยืมอยู่)</h3>
+      <div id="return-list" class="space-y-2"></div>
+      <p id="no-return" class="text-center text-gray-400 py-5 text-sm">ไม่มีรายการที่ต้องคืน</p>
+     </div>
+    </section>
+
+    <!-- History -->
+    <section id="page-history" class="page fade-in hidden">
+     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <h3 class="text-base font-bold text-gray-800 dark:text-white">📋 ประวัติการยืม-คืน</h3>
+      <div class="flex gap-2">
+       <button id="btn-export-pdf" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium">🖨️ PDF / พิมพ์</button> 
+       <button id="btn-export-excel" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium">📋 Excel (CSV)</button>
+      </div>
+     </div>
+     <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm">
+       <thead>
+        <tr class="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600 text-left text-gray-600 dark:text-gray-300 text-xs">
+         <th class="px-3 py-2">วันที่ยืม</th>
+         <th class="px-3 py-2">วันที่คืน</th>
+         <th class="px-3 py-2">อุปกรณ์</th>
+         <th class="px-3 py-2">ผู้ยืม</th>
+         <th class="px-3 py-2">สถานะ</th>
+        </tr>
+       </thead>
+       <tbody id="history-table"></tbody>
+      </table>
+      <p id="no-history" class="text-center text-gray-400 py-5 text-sm">ยังไม่มีประวัติ</p>
+     </div>
+    </section>
+
+    <!-- Reports -->
+    <section id="page-reports" class="page fade-in hidden">
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2 text-sm">📈 แนวโน้มการยืมรายเดือน</h3>
+       <canvas id="chart-report-monthly" height="200"></canvas>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+       <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2 text-sm">📊 อุปกรณ์ที่ถูกยืมบ่อยสุด</h3>
+       <canvas id="chart-top-items" height="200"></canvas>
+      </div>
+     </div>
+    </section>
+
+    <!-- Maintenance -->
+    <section id="page-maintenance" class="page fade-in hidden">
+     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <h3 class="text-base font-bold text-gray-800 dark:text-white">🛠 รายการซ่อมบำรุง</h3>
+      <button id="btn-add-maint" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium">➕ เพิ่มรายการซ่อม</button>
+     </div>
+     <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm">
+       <thead>
+        <tr class="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600 text-left text-gray-600 dark:text-gray-300 text-xs">
+         <th class="px-3 py-2">อุปกรณ์</th>
+         <th class="px-3 py-2">จำนวน</th>
+         <th class="px-3 py-2">วันที่ส่งซ่อม</th>
+         <th class="px-3 py-2">สถานะ</th>
+         <th class="px-3 py-2">สาเหตุ</th>
+         <th class="px-3 py-2">จัดการ</th>
+        </tr>
+       </thead>
+       <tbody id="maint-table"></tbody>
+      </table>
+      <p id="no-maint" class="text-center text-gray-400 py-5 text-sm">ไม่มีรายการซ่อมบำรุง</p>
+     </div>
+    </section>
+   </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay">
+   <div class="bg-white dark:bg-slate-800 rounded-xl w-full max-w-lg mx-4 max-h-[80vh] overflow-y-auto p-5 shadow-2xl fade-in">
+    <div class="flex items-center justify-between mb-3">
+     <h3 id="modal-title" class="text-base font-bold text-gray-800 dark:text-white"></h3>
+     <button id="modal-close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
+    </div>
+    <div id="modal-body"></div>
+   </div>
+  </div>
+
+  <!-- Image Preview Modal -->
+  <div id="img-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-overlay">
+   <div class="relative max-w-2xl mx-4">
+    <button id="img-modal-close" class="absolute -top-3 -right-3 bg-white dark:bg-slate-700 text-gray-600 dark:text-gray-200 w-8 h-8 rounded-full shadow-lg flex items-center justify-center text-lg">✕</button> 
+    <img id="img-modal-src" class="max-w-full max-h-[70vh] rounded-xl shadow-2xl object-contain bg-white">
+   </div>
+  </div>
+
+  <!-- Confirm Modal (สร้างใหม่) -->
+  <div id="confirm-modal" class="fixed inset-0 z-[80] hidden items-center justify-center modal-overlay">
+   <div class="bg-white dark:bg-slate-800 rounded-xl w-full max-w-sm mx-4 p-5 shadow-2xl fade-in text-center">
+    <div class="text-4xl mb-3">❓</div>
+    <h3 id="confirm-title" class="text-lg font-bold text-gray-800 dark:text-white mb-2">ยืนยันการดำเนินการ</h3>
+    <p id="confirm-msg" class="text-sm text-gray-600 dark:text-gray-300 mb-5">คุณแน่ใจหรือไม่?</p>
+    <div class="flex gap-3 justify-center">
+     <button id="btn-confirm-cancel" class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition">ยกเลิก</button>
+     <button id="btn-confirm-ok" class="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium transition">ยืนยัน</button>
+    </div>
+   </div>
+  </div>
+
+  <script src="/_sdk/719055fef2a85d14.editing_sdk.js" xintegrity="sha512-kFqrdGgIiTOsu307feB5Cy3JVP9IayftsmCIZ0csxYBGuBmJQPhyvcnmKR8F0fTW97h5s1gAvz3SumI8zJ6OxQ=="></script>
+  <script src="/_sdk/0179d719c431a79e.data_sdk.js" xintegrity="sha512-OsRvJkI5GkC3MJQcgotQYotpzrMSX415GiKKgvYdxQEEkzD/fdchShO2FMSy0PJr/tiINMXOk5Vl2zAgg6bUiA=="></script>
+  
+  <script>
+(function() {
+  'use strict';
+
+  let allData = [];
+  let charts = {};
+  let editingId = null;
+
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+  const esc = (s) => String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const todayStr = () => new Date().toISOString().split('T')[0];
+  const byType = (t) => allData.filter(d => d.type === t);
+
+  function nextOrder() {
+    return byType('equipment').reduce((m, e) => Math.max(m, Number(e.item_order) || 0), 0) + 1;
+  }
+
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast fixed bottom-4 right-4 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg z-[70] text-sm max-w-xs';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // Fallback Polyfill for window.dataSdk (in case it runs completely offline/standalone)
+  if (typeof window.dataSdk === 'undefined' || !window.dataSdk.init) {
+    window.dataSdk = {
+        _subs: [],
+        _data: JSON.parse(localStorage.getItem('moph_mock_data') || '[]'),
+        init: async function(handler) {
+            this._subs.push(handler);
+            setTimeout(() => handler.onDataChanged(this._data), 50);
+            return { isOk: true };
+        },
+        save: async function(item) {
+            if (!item.__backendId) item.__backendId = 'local_' + Date.now() + Math.random().toString(36).substring(2);
+            const idx = this._data.findIndex(d => d.__backendId === item.__backendId);
+            if (idx > -1) this._data[idx] = item;
+            else this._data.push(item);
+            this._commit();
+            return { isOk: true };
+        },
+        delete: async function(id) {
+            this._data = this._data.filter(d => d.__backendId !== id);
+            this._commit();
+            return { isOk: true };
+        },
+        _commit: function() {
+            localStorage.setItem('moph_mock_data', JSON.stringify(this._data));
+            this._subs.forEach(h => h.onDataChanged(this._data));
+        }
+    };
+  }
+
+  // Navigation
+  function showPage(page) {
+    $$('.page').forEach(p => p.classList.add('hidden'));
+    const el = $('#page-' + page);
+    if (el) el.classList.remove('hidden');
+    $$('[data-page]').forEach(b => b.classList.remove('active'));
+    const btn = document.querySelector('[data-page="' + page + '"]');
+    if (btn) btn.classList.add('active');
+    if (page === 'reports') setTimeout(renderReportCharts, 100);
+    if (window.innerWidth < 1024) $('#sidebar').classList.add('-translate-x-full');
+  }
+
+  $('#nav-menu').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-page]');
+    if (btn) showPage(btn.dataset.page);
+  });
+  $('#menu-toggle').addEventListener('click', () => $('#sidebar').classList.toggle('-translate-x-full'));
+  $('#dark-toggle').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    const isDark = document.documentElement.classList.contains('dark');
+    Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+    renderDashboardCharts(); // refresh chart colors
+  });
+
+  // Modal
+  function showModal() { $('#modal').classList.remove('hidden'); $('#modal').classList.add('flex'); }
+  function closeModal() { $('#modal').classList.add('hidden'); $('#modal').classList.remove('flex'); editingId = null; }
+  $('#modal-close').addEventListener('click', closeModal);
+  $('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) closeModal(); });
+
+  // Image modal
+  function showImageModal(src) {
+    $('#img-modal-src').src = src;
+    $('#img-modal').classList.remove('hidden');
+    $('#img-modal').classList.add('flex');
+  }
+  function closeImageModal() { $('#img-modal').classList.add('hidden'); $('#img-modal').classList.remove('flex'); }
+  $('#img-modal-close').addEventListener('click', closeImageModal);
+  $('#img-modal').addEventListener('click', (e) => { if (e.target === $('#img-modal')) closeImageModal(); });
+
+  // Custom Confirm Modal
+  function customConfirm(title, msg, onConfirm) {
+    $('#confirm-title').textContent = title;
+    $('#confirm-msg').textContent = msg;
+    $('#confirm-modal').classList.remove('hidden');
+    $('#confirm-modal').classList.add('flex');
+
+    const btnOk = $('#btn-confirm-ok');
+    const btnCancel = $('#btn-confirm-cancel');
+
+    // ล้าง Event Listener เดิมด้วยการ Clone โหนด
+    const newBtnOk = btnOk.cloneNode(true);
+    btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+    const newBtnCancel = btnCancel.cloneNode(true);
+    btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+
+    const closeModal = () => {
+      $('#confirm-modal').classList.add('hidden');
+      $('#confirm-modal').classList.remove('flex');
+    };
+
+    newBtnCancel.addEventListener('click', closeModal);
+    newBtnOk.addEventListener('click', () => {
+      closeModal();
+      onConfirm();
+    });
+  }
+
+  // Data SDK Handler
+  const dataHandler = {
+    onDataChanged(data) {
+      allData = data;
+      refreshAll();
+    }
+  };
+
+  async function initApp() {
+    const r = await window.dataSdk.init(dataHandler);
+    if (!r.isOk) showToast('❌ ไม่สามารถเชื่อมต่อข้อมูลได้');
+    $('#borrow-date').value = todayStr();
+    showPage('dashboard');
+  }
+
+  function refreshAll() {
+    updateDashboard();
+    renderEquipment();
+    renderBorrowSelects();
+    renderReturnList();
+    renderHistory();
+    renderMaintenance();
+  }
+
+  // Dashboard
+  function updateDashboard() {
+    const eq = byType('equipment');
+    const tx = byType('transaction');
+    const totalQty = eq.reduce((s, e) => s + (Number(e.total_qty) || 0), 0);
+    const availQty = eq.reduce((s, e) => s + (Number(e.available_qty) || 0), 0);
+    const borrowed = tx.filter(t => t.record_status === 'borrowed').length;
+    const maint = byType('maintenance').filter(m => m.record_status === 'repairing').length;
+
+    $('#stat-total').textContent = totalQty;
+    $('#stat-available').textContent = availQty;
+    $('#stat-borrowed').textContent = borrowed;
+    $('#stat-maint').textContent = maint;
+
+    const recent = tx.slice().sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '')).slice(0, 5);
+    const tbody = $('#recent-table');
+    if (recent.length) {
+      $('#no-recent').classList.add('hidden');
+      tbody.innerHTML = recent.map(r => `<tr class="border-b border-gray-100 dark:border-slate-700"><td class="py-2 pr-3 text-xs">${esc(r.borrow_date)}</td><td class="py-2 pr-3 text-xs">${esc(r.item_name)}</td><td class="py-2 pr-3 text-xs">${esc(r.borrower_name)} ${esc(r.borrower_surname)}</td><td class="py-2"><span class="px-2 py-0.5 rounded-full text-xs ${r.record_status === 'borrowed' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">${r.record_status === 'borrowed' ? 'กำลังยืม' : 'คืนแล้ว'}</span></td></tr>`).join('');
+    } else { $('#no-recent').classList.remove('hidden'); tbody.innerHTML = ''; }
+    renderDashboardCharts();
+  }
+
+  function renderDashboardCharts() {
+    const tx = byType('transaction');
+    const eq = byType('equipment');
+    const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const bM = Array(12).fill(0), rM = Array(12).fill(0);
+    
+    tx.forEach(t => {
+      const m = new Date(t.borrow_date).getMonth();
+      if (!isNaN(m)) bM[m]++;
+      if (t.return_date) { const rm = new Date(t.return_date).getMonth(); if (!isNaN(rm)) rM[rm]++; }
+    });
+
+    if (charts.monthly) charts.monthly.destroy();
+    const c1 = $('#chart-monthly');
+    if (c1) charts.monthly = new Chart(c1, { type: 'bar', data: { labels: months, datasets: [{ label: 'ยืม', data: bM, backgroundColor: '#ef4444' }, { label: 'คืน', data: rM, backgroundColor: '#22c55e' }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+
+    const cats = {};
+    eq.forEach(e => { cats[e.category || 'อื่นๆ'] = (cats[e.category || 'อื่นๆ'] || 0) + (Number(e.total_qty) || 0); });
+    if (charts.category) charts.category.destroy();
+    const c2 = $('#chart-category');
+    if (c2) charts.category = new Chart(c2, { type: 'doughnut', data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#22c55e','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899'] }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } } } });
+  }
+
+  function renderReportCharts() {
+    const tx = byType('transaction');
+    const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const bM = Array(12).fill(0);
+    tx.forEach(t => { const m = new Date(t.borrow_date).getMonth(); if (!isNaN(m)) bM[m]++; });
+
+    if (charts.reportMonthly) charts.reportMonthly.destroy();
+    const c1 = $('#chart-report-monthly');
+    if (c1) charts.reportMonthly = new Chart(c1, { type: 'line', data: { labels: months, datasets: [{ label: 'จำนวนการยืม (ครั้ง)', data: bM, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+
+    const itemCount = {};
+    tx.forEach(t => { itemCount[t.item_name || '?'] = (itemCount[t.item_name || '?'] || 0) + 1; });
+    const sorted = Object.entries(itemCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    if (charts.topItems) charts.topItems.destroy();
+    const c2 = $('#chart-top-items');
+    if (c2) charts.topItems = new Chart(c2, { type: 'bar', data: { labels: sorted.map(s => s[0]), datasets: [{ label: 'ครั้ง', data: sorted.map(s => s[1]), backgroundColor: '#3b82f6' }] }, options: { responsive: true, indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+  }
+
+  // Equipment Table
+  function renderEquipment() {
+    const eq = byType('equipment').sort((a, b) => (Number(a.item_order) || 0) - (Number(b.item_order) || 0));
+    const q = ($('#eq-search').value || '').toLowerCase();
+    const filtered = eq.filter(e => (e.item_name || '').toLowerCase().includes(q));
+    const tbody = $('#eq-table');
+
+    if (filtered.length) {
+      $('#no-eq').classList.add('hidden');
+      tbody.innerHTML = filtered.map(e => {
+        const hasImg = e.equipment_image && String(e.equipment_image).length > 10;
+        const imgCell = hasImg
+          ? `<img src="${e.equipment_image}" class="eq-thumb" data-action="view-img">`
+          : '<div class="eq-thumb-placeholder">📷</div>';
+        return `<tr class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+          <td class="px-3 py-2 text-center font-bold text-primary-700 dark:text-primary-400">${e.item_order || '-'}</td>
+          <td class="px-3 py-2">${imgCell}</td>
+          <td class="px-3 py-2 font-medium text-xs">${esc(e.item_name)}</td>
+          <td class="px-3 py-2 text-xs">${esc(e.category)}</td>
+          <td class="px-3 py-2 text-center text-xs">${e.total_qty || 0}</td>
+          <td class="px-3 py-2 text-center text-xs">${e.available_qty === undefined ? e.total_qty : e.available_qty}</td>
+          <td class="px-3 py-2">
+            <span class="px-2 py-0.5 rounded-full text-xs ${e.status === 'พร้อมใช้งาน' ? 'bg-green-100 text-green-700' : e.status === 'ส่งซ่อม' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}">
+              ${esc(e.status)}
+            </span>
+          </td>
+          <td class="px-3 py-2">
+            <div class="flex gap-2">
+              <button data-action="view-qr" data-id="${e.__backendId}" class="text-purple-500 hover:text-purple-700 text-sm" title="สร้าง QR Code">📱</button>
+              <button data-action="edit-eq" data-id="${e.__backendId}" class="text-blue-500 hover:text-blue-700 text-sm" title="แก้ไข">✏️</button>
+              <button data-action="delete" data-id="${e.__backendId}" class="text-red-500 hover:text-red-700 text-sm" title="ลบ">🗑️</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    } else { 
+      $('#no-eq').classList.remove('hidden'); 
+      tbody.innerHTML = ''; 
+    }
+  }
+
+  $('#eq-search').addEventListener('input', renderEquipment);
+  $('#btn-add-eq').addEventListener('click', () => openEquipmentModal(null));
+  $('#btn-print-summary').addEventListener('click', () => window.print());
+
+  // เปิดหน้าต่าง QR Code
+  function openQRModal(id) {
+    const item = allData.find(d => d.__backendId === id);
+    if(!item) return;
+
+    const hasImg = item.equipment_image && String(item.equipment_image).length > 10;
+    
+    // โครงสร้างป้ายสำหรับพิมพ์
+    const modalBody = `
+      <div id="qr-print-card" class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center max-w-xs mx-auto">
+          <div class="text-center w-full mb-3">
+             <h2 class="text-xl font-bold text-gray-800 leading-tight">${esc(item.item_name)}</h2>
+             <p class="text-sm text-gray-500 mt-1">รหัส/ลำดับ: <span class="font-bold text-primary-600">${item.item_order || '-'}</span></p>
+          </div>
+          
+          ${hasImg 
+            ? `<img src="${item.equipment_image}" class="w-32 h-32 object-cover rounded-lg mb-4 border border-gray-200">` 
+            : `<div class="w-32 h-32 bg-gray-50 rounded-lg mb-4 border border-gray-200 flex items-center justify-center text-4xl">📷</div>`
+          }
+          
+          <canvas id="qr-canvas" class="mb-2"></canvas>
+          <p class="text-[10px] text-gray-400 mt-1 text-center break-all">ID: ${item.__backendId}</p>
+      </div>
+      
+      <div class="mt-5 flex justify-center">
+          <button id="btn-print-qr" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-md">
+             🖨️ พิมพ์ป้าย QR
+          </button>
+      </div>
+    `;
+
+    $('#modal-title').textContent = '📱 ป้าย QR Code อุปกรณ์';
+    $('#modal-body').innerHTML = modalBody;
+
+    // สร้าง QR Code ด้วย QRious
+    const qrData = JSON.stringify({
+        id: item.__backendId,
+        name: item.item_name,
+        order: item.item_order
+    });
+    
+    new QRious({
+        element: document.getElementById('qr-canvas'),
+        value: qrData, // เก็บข้อมูลเป็น JSON String ลงใน QR
+        size: 140,
+        level: 'M'
+    });
+
+    // ปุ่มสั่งพิมพ์เฉพาะป้าย
+    $('#btn-print-qr').addEventListener('click', () => {
+        document.body.classList.add('printing-qr'); // ใส่ Class เพื่อบังคับ CSS ให้ซ่อนทุกอย่างยกเว้นป้าย
+        window.print();
+        setTimeout(() => {
+            document.body.classList.remove('printing-qr'); // เอา Class ออกเมื่อสั่งพิมพ์เสร็จ
+        }, 500);
+    });
+
+    showModal();
+  }
+
+  // Add / Edit Equipment Modal
+  function openEquipmentModal(id) {
+    editingId = id;
+    const item = id ? allData.find(d => d.__backendId === id) : null;
+    const order = item ? item.item_order : nextOrder();
+    const existingImage = item?.equipment_image || '';
+
+    $('#modal-title').textContent = id ? '✏️ แก้ไขอุปกรณ์' : '➕ เพิ่มอุปกรณ์';
+    $('#modal-body').innerHTML = `
+      <form id="eq-form" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="ef-order">ลำดับ</label><input id="ef-order" class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white bg-gray-50 font-bold" value="${order}" readonly></div>
+          <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="ef-name">ชื่ออุปกรณ์ *</label><input id="ef-name" class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="${esc(item?.item_name || '')}" required></div>
+          <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="ef-cat">หมวดหมู่</label><input id="ef-cat" class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="${esc(item?.category || '')}" placeholder="เช่น เครื่องมือแพทย์"></div>
+          <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="ef-qty">จำนวนทั้งหมด</label><input id="ef-qty" type="number" min="1" class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="${item?.total_qty || 1}"></div>
+          <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="ef-status">สถานะ</label><select id="ef-status" class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option ${item?.status === 'พร้อมใช้งาน' || !item ? 'selected' : ''}>พร้อมใช้งาน</option><option ${item?.status === 'ส่งซ่อม' ? 'selected' : ''}>ส่งซ่อม</option><option ${item?.status === 'ชำรุด' ? 'selected' : ''}>ชำรุด</option></select></div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">📷 รูปถ่ายอุปกรณ์</label>
+          <div class="flex gap-3 items-center flex-wrap">
+            <input id="ef-image-input" type="file" accept="image/*" capture="environment" class="hidden">
+            <button type="button" id="ef-image-btn" class="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:border-primary-500 hover:text-primary-600 transition">📁 เลือกรูป / ถ่ายภาพ</button>
+            <div id="ef-image-preview" class="w-20 h-20 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 ${existingImage ? '' : 'hidden'}">
+              <img id="ef-preview-img" class="w-full h-full object-cover" src="${existingImage}">
+            </div>
+            <button type="button" id="ef-image-remove" class="text-red-500 text-xs hover:text-red-700 ${existingImage ? '' : 'hidden'}">❌ ลบรูป</button>
+          </div>
+          <p id="ef-image-name" class="text-xs text-gray-500 dark:text-gray-400 mt-1">${existingImage ? '✅ มีรูปถ่ายแล้ว' : ''}</p>
+        </div>
+        <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="ef-notes">หมายเหตุ</label><textarea id="ef-notes" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white">${esc(item?.notes || '')}</textarea></div>
+        <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium text-sm">💾 บันทึก</button>
+      </form>`;
+
+    let selectedImage = existingImage;
+    const imageBtn = $('#ef-image-btn');
+    const imageInput = $('#ef-image-input');
+    const imagePreview = $('#ef-image-preview');
+    const previewImg = $('#ef-preview-img');
+    const imageRemove = $('#ef-image-remove');
+    const imageName = $('#ef-image-name');
+
+    imageBtn.addEventListener('click', () => imageInput.click());
+
+    imageRemove.addEventListener('click', () => {
+      selectedImage = '';
+      imagePreview.classList.add('hidden');
+      imageRemove.classList.add('hidden');
+      imageName.textContent = '';
+      imageInput.value = '';
+    });
+
+    imageInput.addEventListener('change', (ev) => {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      
+      if (!file.type.startsWith('image/')) {
+        showToast('❌ กรุณาเลือกไฟล์รูปภาพ');
+        imageInput.value = '';
+        return;
+      }
+      
+      if (file.size > 5242880) {
+        showToast('❌ ไฟล์ใหญ่เกิน 5MB');
+        imageInput.value = '';
+        return;
+      }
+
+      imageName.textContent = '⏳ กำลังประมวลผลรูป...';
+      imageBtn.disabled = true;
+
+      const reader = new FileReader();
+      
+      reader.onerror = () => {
+        showToast('❌ ไม่สามารถอ่านไฟล์ได้');
+        imageBtn.disabled = false;
+        imageName.textContent = '';
+      };
+
+      reader.onload = (e) => {
+        selectedImage = e.target.result;
+        previewImg.src = selectedImage;
+        imagePreview.classList.remove('hidden');
+        imageRemove.classList.remove('hidden');
+        imageName.textContent = '✅ อัปโหลดรูปสำเร็จ';
+        imageBtn.disabled = false;
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    $('#eq-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const isNew = !editingId;
+      const oldItem = isNew ? null : allData.find(d => d.__backendId === editingId);
+      const newTotalQty = Number($('#ef-qty').value);
+      
+      // คำนวณจำนวนคงเหลือใหม่ (หากเป็นการแก้ไข)
+      let calculatedAvailableQty = newTotalQty;
+      if (oldItem && oldItem.available_qty !== undefined) {
+          const diff = newTotalQty - oldItem.total_qty;
+          calculatedAvailableQty = oldItem.available_qty + diff;
+      }
+
+      const item = {
+        type: 'equipment',
+        __backendId: editingId,
+        item_order: $('#ef-order').value,
+        item_name: $('#ef-name').value,
+        category: $('#ef-cat').value,
+        total_qty: newTotalQty,
+        available_qty: calculatedAvailableQty < 0 ? 0 : calculatedAvailableQty,
+        status: $('#ef-status').value,
+        equipment_image: selectedImage,
+        notes: $('#ef-notes').value,
+        created_at: oldItem ? oldItem.created_at : new Date().toISOString()
+      };
+
+      await window.dataSdk.save(item);
+      closeModal();
+      showToast('✅ บันทึกอุปกรณ์สำเร็จ');
+    });
+
+    showModal();
+  }
+
+  // --- Borrow & Return Logic ---
+  function renderBorrowSelects() {
+    const eq = byType('equipment').filter(e => e.available_qty > 0 && e.status === 'พร้อมใช้งาน');
+    const select = $('#borrow-equipment');
+    if(select) {
+        select.innerHTML = '<option value="">-- เลือกอุปกรณ์ --</option>' + 
+          eq.map(e => `<option value="${e.__backendId}">${esc(e.item_name)} (คงเหลือ: ${e.available_qty})</option>`).join('');
+    }
+  }
+
+  $('#borrow-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const eqId = $('#borrow-equipment').value;
+    if(!eqId) return showToast('❌ กรุณาเลือกอุปกรณ์');
+
+    const equipment = allData.find(d => d.__backendId === eqId);
+    if(!equipment || equipment.available_qty <= 0) return showToast('❌ อุปกรณ์ถูกยืมหมดแล้ว');
+
+    const tx = {
+      type: 'transaction',
+      record_status: 'borrowed',
+      equipment_id: eqId,
+      item_name: equipment.item_name,
+      borrower_name: $('#borrow-name').value,
+      borrower_surname: $('#borrow-surname').value,
+      borrow_date: $('#borrow-date').value,
+      notes: $('#borrow-notes').value,
+      created_at: new Date().toISOString()
+    };
+
+    // ตัดสต๊อก
+    equipment.available_qty -= 1;
+    await window.dataSdk.save(equipment);
+    await window.dataSdk.save(tx);
+    
+    $('#borrow-form').reset();
+    $('#borrow-date').value = todayStr();
+    
+    $('#borrow-success').classList.remove('hidden');
+    setTimeout(() => $('#borrow-success').classList.add('hidden'), 3000);
+  });
+
+  function renderReturnList() {
+    const borrowed = byType('transaction').filter(t => t.record_status === 'borrowed');
+    const list = $('#return-list');
+    
+    if (borrowed.length) {
+      $('#no-return').classList.add('hidden');
+      list.innerHTML = borrowed.map(b => `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-lg p-3 gap-3">
+          <div>
+            <p class="font-bold text-primary-700 dark:text-primary-400 text-sm">📦 ${esc(b.item_name)}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">👤 ผู้ยืม: ${esc(b.borrower_name)} ${esc(b.borrower_surname)} | 📅 ยืมเมื่อ: ${esc(b.borrow_date)}</p>
+          </div>
+          <button data-action="return-item" data-id="${b.__backendId}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap shadow-sm">
+            ✅ รับคืน
+          </button>
+        </div>
+      `).join('');
+    } else {
+      $('#no-return').classList.remove('hidden');
+      list.innerHTML = '';
+    }
+  }
+
+  async function returnItem(txId) {
+    const tx = allData.find(d => d.__backendId === txId);
+    if(!tx) return;
+    
+    tx.record_status = 'returned';
+    tx.return_date = todayStr();
+    
+    // คืนสต๊อก
+    const equipment = allData.find(d => d.__backendId === tx.equipment_id);
+    if(equipment) {
+       equipment.available_qty = (equipment.available_qty || 0) + 1;
+       await window.dataSdk.save(equipment);
+    }
+    await window.dataSdk.save(tx);
+    showToast('✅ รับคืนอุปกรณ์สำเร็จ');
+  }
+
+  // --- History & Maintenance ---
+  function renderHistory() {
+    const tx = byType('transaction').sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+    const tbody = $('#history-table');
+    
+    if (tx.length) {
+      $('#no-history').classList.add('hidden');
+      tbody.innerHTML = tx.map(t => `
+        <tr class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+          <td class="px-3 py-2 text-xs">${esc(t.borrow_date)}</td>
+          <td class="px-3 py-2 text-xs">${t.return_date ? esc(t.return_date) : '-'}</td>
+          <td class="px-3 py-2 font-medium text-xs">${esc(t.item_name)}</td>
+          <td class="px-3 py-2 text-xs">${esc(t.borrower_name)} ${esc(t.borrower_surname)}</td>
+          <td class="px-3 py-2">
+            <span class="px-2 py-0.5 rounded-full text-xs ${t.record_status === 'borrowed' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+              ${t.record_status === 'borrowed' ? 'กำลังยืม' : 'คืนแล้ว'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    } else {
+      $('#no-history').classList.remove('hidden');
+      tbody.innerHTML = '';
+    }
+  }
+
+  function renderMaintenance() {
+    const maint = byType('maintenance').sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+    const tbody = $('#maint-table');
+    
+    if (maint.length) {
+      $('#no-maint').classList.add('hidden');
+      tbody.innerHTML = maint.map(m => `
+        <tr class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+          <td class="px-3 py-2 font-medium text-xs">${esc(m.item_name)}</td>
+          <td class="px-3 py-2 text-xs text-center">${m.qty}</td>
+          <td class="px-3 py-2 text-xs">${esc(m.maint_date)}</td>
+          <td class="px-3 py-2">
+            <span class="px-2 py-0.5 rounded-full text-xs ${m.record_status === 'repairing' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}">
+              ${m.record_status === 'repairing' ? 'กำลังซ่อม' : 'ซ่อมเสร็จสิ้น'}
+            </span>
+          </td>
+          <td class="px-3 py-2 text-xs text-gray-500">${esc(m.notes || '-')}</td>
+          <td class="px-3 py-2">
+            ${m.record_status === 'repairing' ? 
+              `<button data-action="finish-maint" data-id="${m.__backendId}" class="text-green-600 hover:text-green-800 text-xs font-bold border border-green-600 rounded px-2 py-1">ซ่อมเสร็จ</button>` : 
+              `<span class="text-xs text-gray-400">ปิดงานแล้ว</span>`
+            }
+          </td>
+        </tr>
+      `).join('');
+    } else {
+      $('#no-maint').classList.remove('hidden');
+      tbody.innerHTML = '';
+    }
+  }
+
+  $('#btn-add-maint').addEventListener('click', () => {
+    const eq = byType('equipment');
+    
+    $('#modal-title').textContent = '🛠 เพิ่มรายการส่งซ่อม';
+    $('#modal-body').innerHTML = `
+      <form id="maint-form" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="mf-equipment">อุปกรณ์</label>
+          <select id="mf-equipment" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm" required>
+             <option value="">-- เลือกอุปกรณ์ --</option>
+             ${eq.map(e => `<option value="${e.__backendId}">${esc(e.item_name)} (ว่าง: ${e.available_qty})</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="mf-qty">จำนวน (ชิ้น)</label>
+          <input id="mf-qty" type="number" min="1" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm" value="1" required>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1" for="mf-notes">สาเหตุ/อาการเสีย</label>
+          <textarea id="mf-notes" rows="2" class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm" required></textarea>
+        </div>
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-medium text-sm">💾 บันทึกส่งซ่อม</button>
+      </form>
+    `;
+    
+    $('#maint-form').addEventListener('submit', async (e) => {
+       e.preventDefault();
+       const eqId = $('#mf-equipment').value;
+       const qty = Number($('#mf-qty').value);
+       const equipment = allData.find(d => d.__backendId === eqId);
+       
+       if(!equipment || equipment.available_qty < qty) {
+           return showToast('❌ จำนวนอุปกรณ์ที่พร้อมใช้งานไม่เพียงพอ');
+       }
+       
+       // อัปเดตสต๊อก
+       equipment.available_qty -= qty;
+       equipment.status = equipment.available_qty === 0 ? 'ส่งซ่อม' : equipment.status;
+       
+       const maint = {
+           type: 'maintenance',
+           equipment_id: eqId,
+           item_name: equipment.item_name,
+           qty: qty,
+           record_status: 'repairing',
+           maint_date: todayStr(),
+           notes: $('#mf-notes').value,
+           created_at: new Date().toISOString()
+       };
+       
+       await window.dataSdk.save(equipment);
+       await window.dataSdk.save(maint);
+       
+       closeModal();
+       showToast('✅ บันทึกรายการส่งซ่อมสำเร็จ');
+    });
+    
+    showModal();
+  });
+
+  async function finishMaintenance(maintId) {
+      const maint = allData.find(d => d.__backendId === maintId);
+      if(!maint) return;
+      
+      maint.record_status = 'completed';
+      maint.finish_date = todayStr();
+      
+      const equipment = allData.find(d => d.__backendId === maint.equipment_id);
+      if(equipment) {
+          equipment.available_qty += maint.qty;
+          if(equipment.status === 'ส่งซ่อม' && equipment.available_qty > 0) {
+              equipment.status = 'พร้อมใช้งาน';
+          }
+          await window.dataSdk.save(equipment);
+      }
+      await window.dataSdk.save(maint);
+      showToast('✅ อัปเดตรายการซ่อมเสร็จสิ้น');
+  }
+
+  // --- Global Clicks Event Delegation ---
+  document.addEventListener('click', async (e) => {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+    
+    const action = target.dataset.action;
+    const id = target.dataset.id;
+    
+    if (action === 'view-img') {
+      showImageModal(target.src);
+    } else if (action === 'edit-eq') {
+      openEquipmentModal(id);
+    } else if (action === 'view-qr') { 
+      openQRModal(id); // <--- เปิดฟังก์ชันป้าย QR Code
+    } else if (action === 'delete') {
+      customConfirm('ยืนยันการลบข้อมูล', 'ข้อมูลที่ถูกลบจะไม่สามารถกู้คืนได้ แน่ใจหรือไม่?', async () => {
+        await window.dataSdk.delete(id);
+        showToast('🗑️ ลบรายการสำเร็จ');
+      });
+    } else if (action === 'return-item') {
+      customConfirm('ยืนยันการรับคืน', 'ต้องการรับคืนอุปกรณ์นี้ใช่หรือไม่?', () => returnItem(id));
+    } else if (action === 'finish-maint') {
+      customConfirm('ยืนยันการซ่อมเสร็จ', 'อุปกรณ์ซ่อมเสร็จและสามารถนำกลับมาใช้งานได้แล้วใช่หรือไม่?', () => finishMaintenance(id));
+    }
+  });
+
+  // --- Export Excel (CSV) ---
+  $('#btn-export-excel').addEventListener('click', () => {
+      const tx = byType('transaction');
+      if(!tx.length) return showToast('❌ ไม่มีข้อมูลสำหรับส่งออก');
+      
+      let csv = "\uFEFFวันที่ยืม,วันที่คืน,อุปกรณ์,ผู้ยืม,สถานะ\n"; // \uFEFF for UTF-8 BOM Excel compatibility
+      tx.forEach(t => {
+          csv += `"${t.borrow_date || ''}","${t.return_date || ''}","${t.item_name || ''}","${t.borrower_name} ${t.borrower_surname}","${t.record_status === 'borrowed' ? 'กำลังยืม' : 'คืนแล้ว'}"\n`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "ประวัติการยืมคืน_รพสต.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  });
+  
+  // พิมพ์หน้าประวัติ PDF (อาศัยการสั่งพิมพ์ของ Browser)
+  $('#btn-export-pdf').addEventListener('click', () => {
+    const originalContent = document.body.innerHTML;
+    const printContent = $('#page-history').innerHTML;
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+    window.location.reload(); // Reload เพื่อดึง Event Listener กลับมา
+  });
+
+  // Initialize
+  window.addEventListener('DOMContentLoaded', initApp);
+
+})();
+  </script>
+</body>
+</html>
