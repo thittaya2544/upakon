@@ -1,10 +1,3 @@
-จัดให้ตามคำขอครับ! เพื่อให้ระบบสมบูรณ์และใช้งานได้จริงใน รพ.สต. ผมได้เพิ่มฟังก์ชัน **"📱 พิมพ์ QR ทั้งหมด"** (สร้างคิวอาร์โค้ดของอุปกรณ์ทั้งหมดอัตโนมัติในรูปแบบของสติ๊กเกอร์/ป้ายกำกับ) ไว้ในหน้า **ทะเบียนอุปกรณ์** ครับ
-
-เมื่อกดปุ่มนี้ ระบบจะดึงข้อมูลอุปกรณ์ทั้งหมดมา **สร้างเป็นคิวอาร์โค้ดอัตโนมัติ จัดเรียงเป็นตารางสวยงาม** เพื่อให้คุณสามารถสั่งพิมพ์ลงกระดาษ A4 หรือสติ๊กเกอร์ นำไปตัดและแปะติดกับตัวอุปกรณ์ของจริงได้ทันทีครับ
-
-นี่คือโค้ดที่อัปเดตแล้ว ก๊อปปี้ไปทับไฟล์เดิมได้เลยครับ:
-
-```html
 <!doctype html>
 <html lang="th">
  <head>
@@ -55,9 +48,11 @@
  </head>
  <body data-template-id="__page-root" class="min-h-screen text-slate-800 dark:text-slate-200 transition-colors duration-300">
   
+  <!-- Sidebar -->
   <aside id="sidebar" class="fixed left-0 top-0 w-60 h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-r border-slate-200 dark:border-slate-700 z-40 transition-transform lg:translate-x-0 -translate-x-full overflow-y-auto shadow-xl lg:shadow-none">
    <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex flex-col items-center">
-    <img id="moph-logo" class="w-14 h-14 mb-2 drop-shadow-sm" src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Ministry_of_Public_Health_Thailand_Logo.svg" alt="MOPH">
+    <!-- เปลี่ยน URL ของรูปตราสัญลักษณ์ตรงนี้ -->
+    <img id="moph-logo" class="w-14 h-14 mb-2 drop-shadow-sm" src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_the_Ministry_of_Public_Health_of_Thailand.svg" alt="MOPH">
     <h1 class="text-sm font-bold text-gradient leading-tight text-center">ยืม-คืนอุปกรณ์ รพ.สต.</h1>
    </div>
    <nav class="p-3 space-y-1" id="nav-menu">
@@ -74,6 +69,7 @@
   <button id="menu-toggle" class="lg:hidden fixed top-3 left-3 z-50 bg-gradient-btn text-white p-2 rounded-xl shadow-lg">☰</button>
   
   <div class="lg:ml-60 min-h-screen flex flex-col">
+   <!-- Header -->
    <header class="sticky top-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 z-30 px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3 lg:hidden"><div class="w-10"></div></div>
     <div class="flex-1 lg:flex-none text-center lg:text-left">
@@ -84,6 +80,7 @@
    </header>
    
    <main class="p-4 md:p-6 flex-1">
+    <!-- Dashboard -->
     <section id="page-dashboard" class="page fade-in">
      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
       <h3 class="text-lg font-bold text-slate-800 dark:text-white">📊 ภาพรวมระบบ (Dashboard)</h3>
@@ -121,6 +118,7 @@
      </div>
     </section>
 
+    <!-- Equipment -->
     <section id="page-equipment" class="page fade-in hidden">
      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
       <div class="relative flex-1 min-w-[250px] max-w-md">
@@ -156,6 +154,7 @@
      </div>
     </section>
 
+    <!-- Borrow -->
     <section id="page-borrow" class="page fade-in hidden">
      <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-lg relative overflow-hidden">
       <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary-400 to-teal-500"></div>
@@ -184,6 +183,7 @@
      </div>
     </section>
 
+    <!-- Return -->
     <section id="page-return" class="page fade-in hidden">
      <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-lg">
       <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">🔄 รายการที่รอการส่งคืน</h3>
@@ -192,6 +192,7 @@
      </div>
     </section>
 
+    <!-- History -->
     <section id="page-history" class="page fade-in hidden">
      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
       <h3 class="text-lg font-bold">📋 ประวัติการทำรายการ</h3>
@@ -215,10 +216,12 @@
      </div>
     </section>
 
+    <!-- Reports -->
     <section id="page-reports" class="page fade-in hidden">
       <p class="text-slate-500">ดูสถิติได้ที่หน้าแดชบอร์ดหลัก</p>
     </section>
 
+    <!-- Maintenance -->
     <section id="page-maintenance" class="page fade-in hidden">
      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
       <h3 class="text-lg font-bold">🛠 จัดการงานซ่อมบำรุง</h3>
@@ -241,6 +244,7 @@
    </main>
   </div>
 
+  <!-- Main Modal -->
   <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto p-6 shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
     <div class="flex items-center justify-between mb-4 border-b pb-3">
@@ -251,6 +255,7 @@
    </div>
   </div>
 
+  <!-- QR / Image Preview Modal -->
   <div id="img-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
    <div class="relative max-w-2xl mx-4 transform scale-95 transition-transform duration-300" id="img-modal-content">
     <button id="img-modal-close" class="absolute -top-4 -right-4 bg-white text-slate-600 w-10 h-10 rounded-full shadow-xl flex items-center justify-center">✕</button>
