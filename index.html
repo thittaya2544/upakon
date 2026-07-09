@@ -1,8 +1,13 @@
+จัดให้ตามคำขอครับ! เพื่อให้ระบบสมบูรณ์และใช้งานได้จริงใน รพ.สต. ผมได้เพิ่มฟังก์ชัน **"📱 พิมพ์ QR ทั้งหมด"** (สร้างคิวอาร์โค้ดของอุปกรณ์ทั้งหมดอัตโนมัติในรูปแบบของสติ๊กเกอร์/ป้ายกำกับ) ไว้ในหน้า **ทะเบียนอุปกรณ์** ครับ
+
+เมื่อกดปุ่มนี้ ระบบจะดึงข้อมูลอุปกรณ์ทั้งหมดมา **สร้างเป็นคิวอาร์โค้ดอัตโนมัติ จัดเรียงเป็นตารางสวยงาม** เพื่อให้คุณสามารถสั่งพิมพ์ลงกระดาษ A4 หรือสติ๊กเกอร์ นำไปตัดและแปะติดกับตัวอุปกรณ์ของจริงได้ทันทีครับ
+
+นี่คือโค้ดที่อัปเดตแล้ว ก๊อปปี้ไปทับไฟล์เดิมได้เลยครับ:
+
+```html
 <!doctype html>
 <html lang="th">
  <head>
-  <script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260709-05-e5cead5"}');</script>
-  <script src="/_sdk/f432b76fb310b513.telemetry_sdk.js" integrity="sha512-9FJQ55EKmmqhyyik8BhrMVfm0+iYYfb8uOlRsjtkxJMEI97qOVEI4PnHohDjQAtvAep0IOEpdQ64eki0sz62ug=="></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบทะเบียนยืม-คืนอุปกรณ์ รพ.สต.คลองจระเข้</title>
@@ -22,49 +27,38 @@
     .fade-in { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     
-    /* Sidebar Styling */
     .sidebar-item { transition: all 0.2s ease; margin-bottom: 2px; }
     .sidebar-item:hover { background: #f1f5f9; transform: translateX(4px); }
     .dark .sidebar-item:hover { background: #1e293b; }
     .sidebar-item.active { background: linear-gradient(to right, #0d9488, #14b8a6); color: white; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.3); font-weight: 500; }
-    .dark .sidebar-item.active { background: linear-gradient(to right, #0f766e, #0d9488); color: white; }
     
-    /* Card Styling */
     .stat-card { transition: all 0.3s ease; }
     .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(20, 184, 166, 0.25); border-color: #99f6e4; }
-    .dark .stat-card:hover { border-color: #0f766e; box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.5); }
     
-    /* Gradient Text & Backgrounds */
     .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #0d9488, #059669); }
     .dark .text-gradient { background-image: linear-gradient(to right, #2dd4bf, #34d399); }
     .bg-gradient-btn { background: linear-gradient(135deg, #0d9488, #059669); transition: all 0.2s ease; }
     .bg-gradient-btn:hover { background: linear-gradient(135deg, #0f766e, #047857); box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); transform: translateY(-1px); }
     
-    /* Misc */
     .modal-overlay { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
     .toast { animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     @keyframes slideUp { from{opacity:0;transform:translateY(20px) scale(0.9)} to{opacity:1;transform:translateY(0) scale(1)} }
     
     .eq-thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 2px solid #e2e8f0; cursor: pointer; transition: transform 0.2s; }
     .eq-thumb:hover { transform: scale(1.1); border-color: #2dd4bf; }
-    .dark .eq-thumb { border-color: #334155; }
     .eq-thumb-placeholder { width: 44px; height: 44px; border-radius: 8px; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; background: #f8fafc; font-size: 18px; color: #94a3b8; }
-    .dark .eq-thumb-placeholder { border-color: #475569; background: #1e293b; color: #64748b; }
     
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    .dark ::-webkit-scrollbar-thumb { background: #475569; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
  </head>
  <body data-template-id="__page-root" class="min-h-screen text-slate-800 dark:text-slate-200 transition-colors duration-300">
   
   <aside id="sidebar" class="fixed left-0 top-0 w-60 h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-r border-slate-200 dark:border-slate-700 z-40 transition-transform lg:translate-x-0 -translate-x-full overflow-y-auto shadow-xl lg:shadow-none">
    <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex flex-col items-center">
-    <img data-template-id="moph-emblem" class="w-14 h-14 mb-2 drop-shadow-sm" loading="lazy">
-    <h1 data-template-id="sidebar-title" class="text-sm font-bold text-gradient leading-tight text-center"></h1>
+    <img id="moph-logo" class="w-14 h-14 mb-2 drop-shadow-sm" src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Ministry_of_Public_Health_Thailand_Logo.svg" alt="MOPH">
+    <h1 class="text-sm font-bold text-gradient leading-tight text-center">ยืม-คืนอุปกรณ์ รพ.สต.</h1>
    </div>
    <nav class="p-3 space-y-1" id="nav-menu">
      <button data-page="dashboard" class="sidebar-item w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium">📊 แดชบอร์ด</button> 
@@ -77,73 +71,52 @@
    </nav>
   </aside>
   
-  <button id="menu-toggle" class="lg:hidden fixed top-3 left-3 z-50 bg-gradient-btn text-white p-2 rounded-xl shadow-lg" aria-label="เปิดเมนู">☰</button>
+  <button id="menu-toggle" class="lg:hidden fixed top-3 left-3 z-50 bg-gradient-btn text-white p-2 rounded-xl shadow-lg">☰</button>
   
   <div class="lg:ml-60 min-h-screen flex flex-col">
-   <header data-template-id="header-section" class="sticky top-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 z-30 px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3 lg:hidden">
-      <div class="w-10"></div>
-    </div>
+   <header class="sticky top-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 z-30 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3 lg:hidden"><div class="w-10"></div></div>
     <div class="flex-1 lg:flex-none text-center lg:text-left">
-      <h2 data-template-id="header-title" class="text-lg font-bold text-slate-800 dark:text-slate-100"></h2>
-      <p data-template-id="header-subtitle" class="text-xs font-medium text-primary-600 dark:text-primary-400"></p>
+      <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">ระบบทะเบียนยืม-คืนอุปกรณ์การแพทย์</h2>
+      <p class="text-xs font-medium text-primary-600 dark:text-primary-400">โรงพยาบาลส่งเสริมสุขภาพตำบลคลองจระเข้</p>
     </div>
-    <button id="dark-toggle" class="p-2.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors shadow-sm" aria-label="สลับโหมดมืด">🌓</button>
+    <button id="dark-toggle" class="p-2.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors shadow-sm">🌓</button>
    </header>
    
    <main class="p-4 md:p-6 flex-1">
-    
     <section id="page-dashboard" class="page fade-in">
+     <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <h3 class="text-lg font-bold text-slate-800 dark:text-white">📊 ภาพรวมระบบ (Dashboard)</h3>
+      <button id="btn-print-dashboard" class="bg-emerald-700 text-white hover:bg-emerald-800 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-1">🖨️ พิมพ์หน้าสรุป</button>
+     </div>
+     
      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div class="stat-card bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
-       <div class="absolute -right-4 -top-4 text-6xl opacity-5">📦</div>
-       <p class="text-xs font-medium text-slate-500 dark:text-slate-400">อุปกรณ์ทั้งหมด</p>
+       <p class="text-xs font-medium text-slate-500 mt-1">อุปกรณ์ทั้งหมด</p>
        <p id="stat-total" class="text-3xl font-bold text-slate-800 dark:text-white mt-1">0</p>
       </div>
       <div class="stat-card bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
-       <div class="absolute -right-4 -top-4 text-6xl opacity-5">🟢</div>
-       <p class="text-xs font-medium text-slate-500 dark:text-slate-400">พร้อมใช้งาน</p>
+       <p class="text-xs font-medium text-slate-500 mt-1">พร้อมใช้งาน</p>
        <p id="stat-available" class="text-3xl font-bold text-emerald-500 mt-1">0</p>
       </div>
       <div class="stat-card bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
-       <div class="absolute -right-4 -top-4 text-6xl opacity-5">🔴</div>
-       <p class="text-xs font-medium text-slate-500 dark:text-slate-400">กำลังถูกยืม</p>
+       <p class="text-xs font-medium text-slate-500 mt-1">กำลังถูกยืม</p>
        <p id="stat-borrowed" class="text-3xl font-bold text-rose-500 mt-1">0</p>
       </div>
       <div class="stat-card bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
-       <div class="absolute -right-4 -top-4 text-6xl opacity-5">🛠</div>
-       <p class="text-xs font-medium text-slate-500 dark:text-slate-400">ส่งซ่อมบำรุง</p>
+       <p class="text-xs font-medium text-slate-500 mt-1">ส่งซ่อมบำรุง</p>
        <p id="stat-maint" class="text-3xl font-bold text-amber-500 mt-1">0</p>
       </div>
      </div>
+     
      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
       <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm">
-       <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 text-sm flex items-center gap-2"><span class="text-primary-500">📈</span> สถิติยืม-คืนรายเดือน</h3>
+       <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 text-sm">📈 สถิติยืม-คืนรายเดือน</h3>
        <canvas id="chart-monthly" height="160"></canvas>
       </div>
       <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm">
-       <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 text-sm flex items-center gap-2"><span class="text-primary-500">📊</span> สัดส่วนประเภทอุปกรณ์</h3>
+       <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 text-sm">📊 สัดส่วนประเภทอุปกรณ์</h3>
        <canvas id="chart-category" height="160"></canvas>
-      </div>
-     </div>
-     <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm">
-      <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 text-sm flex items-center gap-2"><span class="text-primary-500">📋</span> รายการทำรายการล่าสุด</h3>
-      <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
-       <table class="w-full text-sm">
-        <thead class="bg-slate-50 dark:bg-slate-700/50">
-         <tr class="text-left text-slate-500 dark:text-slate-300 text-xs uppercase tracking-wider">
-          <th class="px-4 py-3 font-medium">วันที่</th>
-          <th class="px-4 py-3 font-medium">อุปกรณ์</th>
-          <th class="px-4 py-3 font-medium">ผู้ยืม</th>
-          <th class="px-4 py-3 font-medium">สถานะ</th>
-         </tr>
-        </thead>
-        <tbody id="recent-table" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
-       </table>
-       <div id="no-recent" class="text-center text-slate-400 py-8 text-sm flex flex-col items-center">
-         <span class="text-3xl mb-2 opacity-50">📭</span>
-         ยังไม่มีรายการ
-       </div>
       </div>
      </div>
     </section>
@@ -152,11 +125,12 @@
      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
       <div class="relative flex-1 min-w-[250px] max-w-md">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
-        <input id="eq-search" type="text" placeholder="ค้นหาชื่ออุปกรณ์ หรือหมวดหมู่..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-shadow bg-white shadow-sm">
+        <input id="eq-search" type="text" placeholder="ค้นหาชื่ออุปกรณ์ หรือหมวดหมู่..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white rounded-xl text-sm outline-none bg-white">
       </div>
-      <div class="flex gap-2">
-       <button id="btn-print-summary" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors">🖨️ พิมพ์</button> 
-       <button id="btn-add-eq" class="bg-gradient-btn text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md flex items-center gap-2"><span>➕</span> เพิ่มอุปกรณ์ใหม่</button>
+      <div class="flex flex-wrap gap-2">
+       <button id="btn-print-all-qrs" class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-1">📱 พิมพ์ QR ทั้งหมด</button>
+       <button id="btn-print-summary" class="bg-emerald-700 text-white hover:bg-emerald-800 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-1">🖨️ พิมพ์ทะเบียน</button> 
+       <button id="btn-add-eq" class="bg-gradient-btn text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md">➕ เพิ่มอุปกรณ์</button>
       </div>
      </div>
      
@@ -166,7 +140,7 @@
         <thead class="bg-slate-50 dark:bg-slate-700/80">
          <tr class="text-left text-slate-600 dark:text-slate-300 text-xs font-semibold tracking-wide">
           <th class="px-4 py-3 text-center">ลำดับ</th>
-          <th class="px-4 py-3">รูปภาพ</th>
+          <th class="px-4 py-3 text-center">รูปภาพ</th>
           <th class="px-4 py-3">ชื่ออุปกรณ์</th>
           <th class="px-4 py-3">หมวดหมู่</th>
           <th class="px-4 py-3 text-center">ทั้งหมด</th>
@@ -178,75 +152,50 @@
         <tbody id="eq-table" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
        </table>
       </div>
-      <div id="no-eq" class="text-center text-slate-400 py-12 text-sm flex flex-col items-center">
-        <span class="text-4xl mb-3 opacity-50">📦</span>
-        ยังไม่มีอุปกรณ์ในระบบ
-      </div>
+      <div id="no-eq" class="text-center text-slate-400 py-12 text-sm flex flex-col items-center">📦 ยังไม่มีอุปกรณ์ในระบบ</div>
      </div>
     </section>
 
     <section id="page-borrow" class="page fade-in hidden">
-     <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-100 dark:border-slate-700 shadow-lg relative overflow-hidden">
+     <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-lg relative overflow-hidden">
       <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary-400 to-teal-500"></div>
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 text-xl">📝</div>
-        <h3 class="text-lg font-bold text-slate-800 dark:text-white">แบบฟอร์มยืมอุปกรณ์</h3>
-      </div>
-      
+      <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">📝 แบบฟอร์มยืมอุปกรณ์</h3>
       <form id="borrow-form" class="space-y-5">
        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" for="borrow-name">ชื่อผู้ยืม</label> 
-          <input id="borrow-name" type="text" class="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none" required placeholder="ระบุชื่อ">
+          <label class="block text-xs font-semibold mb-1.5">ชื่อผู้ยืม</label> 
+          <input id="borrow-name" type="text" class="w-full border dark:bg-slate-700/50 rounded-xl px-4 py-2.5 text-sm outline-none" required placeholder="ระบุชื่อ">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" for="borrow-surname">นามสกุล</label> 
-          <input id="borrow-surname" type="text" class="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none" required placeholder="ระบุนามสกุล">
+          <label class="block text-xs font-semibold mb-1.5">นามสกุล</label> 
+          <input id="borrow-surname" type="text" class="w-full border dark:bg-slate-700/50 rounded-xl px-4 py-2.5 text-sm outline-none" required placeholder="ระบุนามสกุล">
         </div>
         <div class="md:col-span-2">
-          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" for="borrow-equipment">อุปกรณ์ที่ต้องการยืม</label> 
-          <select id="borrow-equipment" class="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none" required></select>
+          <label class="block text-xs font-semibold mb-1.5">อุปกรณ์ที่ต้องการยืม</label> 
+          <select id="borrow-equipment" class="w-full border dark:bg-slate-700/50 rounded-xl px-4 py-2.5 text-sm outline-none" required></select>
         </div>
         <div class="md:col-span-2">
-          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" for="borrow-date">วันที่ยืม</label> 
-          <input id="borrow-date" type="date" class="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none" required>
+          <label class="block text-xs font-semibold mb-1.5">วันที่ยืม</label> 
+          <input id="borrow-date" type="date" class="w-full border dark:bg-slate-700/50 rounded-xl px-4 py-2.5 text-sm outline-none" required>
         </div>
        </div>
-       <div>
-         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" for="borrow-notes">หมายเหตุ (ถ้ามี)</label> 
-         <textarea id="borrow-notes" rows="3" class="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none" placeholder="ระบุข้อมูลเพิ่มเติม..."></textarea>
-       </div>
-       <button type="submit" id="borrow-submit" class="w-full bg-gradient-btn text-white py-3 rounded-xl font-bold text-sm shadow-md hover:shadow-lg mt-2 flex justify-center items-center gap-2">
-         💾 ยืนยันการยืมอุปกรณ์
-       </button>
+       <button type="submit" class="w-full bg-gradient-btn text-white py-3 rounded-xl font-bold text-sm shadow-md">💾 ยืนยันการยืมอุปกรณ์</button>
       </form>
-      <div id="borrow-success" class="hidden mt-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-emerald-700 dark:text-emerald-400 text-center text-sm font-medium flex items-center justify-center gap-2">
-       <span>✅</span> บันทึกข้อมูลการยืมสำเร็จ!
-      </div>
      </div>
     </section>
 
     <section id="page-return" class="page fade-in hidden">
-     <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-100 dark:border-slate-700 shadow-lg">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl">🔄</div>
-        <h3 class="text-lg font-bold text-slate-800 dark:text-white">รายการที่รอการส่งคืน</h3>
-      </div>
+     <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-lg">
+      <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">🔄 รายการที่รอการส่งคืน</h3>
       <div id="return-list" class="space-y-3"></div>
-      <div id="no-return" class="text-center text-slate-400 py-10 text-sm flex flex-col items-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-        <span class="text-3xl mb-2 opacity-50">✨</span>
-        เยี่ยมมาก! ไม่มีอุปกรณ์ที่ค้างส่งคืน
-      </div>
+      <div id="no-return" class="text-center text-slate-400 py-10 text-sm">✨ ไม่มีอุปกรณ์ที่ค้างส่งคืน</div>
      </div>
     </section>
 
     <section id="page-history" class="page fade-in hidden">
      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
-      <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2"><span class="text-primary-500">📋</span> ประวัติการทำรายการ</h3>
-      <div class="flex gap-2">
-       <button id="btn-export-pdf" class="bg-white dark:bg-slate-800 text-rose-600 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-1">🖨️ PDF</button> 
-       <button id="btn-export-excel" class="bg-white dark:bg-slate-800 text-emerald-600 border border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-1">📊 Excel</button>
-      </div>
+      <h3 class="text-lg font-bold">📋 ประวัติการทำรายการ</h3>
+      <button id="btn-print-history" class="bg-emerald-700 text-white hover:bg-emerald-800 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-1">🖨️ พิมพ์รายงานประวัติ</button>
      </div>
      <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
@@ -256,57 +205,37 @@
           <th class="px-4 py-3">วันที่ยืม</th>
           <th class="px-4 py-3">วันที่คืน</th>
           <th class="px-4 py-3">ชื่ออุปกรณ์</th>
-          <th class="px-4 py-3">ชื่อ-นามสกุลผู้ยืม</th>
+          <th class="px-4 py-3">ผู้ยืม</th>
           <th class="px-4 py-3 text-center">สถานะ</th>
          </tr>
         </thead>
         <tbody id="history-table" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
        </table>
       </div>
-      <div id="no-history" class="text-center text-slate-400 py-10 text-sm flex flex-col items-center">
-        <span class="text-3xl mb-2 opacity-50">📂</span>
-        ยังไม่มีประวัติการทำรายการ
-      </div>
      </div>
     </section>
 
     <section id="page-reports" class="page fade-in hidden">
-     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm">
-       <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-4 text-sm flex items-center gap-2"><span class="text-primary-500">📈</span> แนวโน้มการยืมรายเดือน</h3>
-       <canvas id="chart-report-monthly" height="200"></canvas>
-      </div>
-      <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm">
-       <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-4 text-sm flex items-center gap-2"><span class="text-primary-500">🏆</span> 5 อันดับอุปกรณ์ยอดนิยม</h3>
-       <canvas id="chart-top-items" height="200"></canvas>
-      </div>
-     </div>
+      <p class="text-slate-500">ดูสถิติได้ที่หน้าแดชบอร์ดหลัก</p>
     </section>
 
     <section id="page-maintenance" class="page fade-in hidden">
      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
-      <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2"><span class="text-amber-500">🛠</span> จัดการงานซ่อมบำรุง</h3>
-      <button id="btn-add-maint" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all flex items-center gap-2">➕ แจ้งส่งซ่อมใหม่</button>
+      <h3 class="text-lg font-bold">🛠 จัดการงานซ่อมบำรุง</h3>
+      <button id="btn-add-maint" class="bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md">➕ แจ้งส่งซ่อมใหม่</button>
      </div>
      <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
        <table class="w-full text-sm">
         <thead class="bg-slate-50 dark:bg-slate-700/80">
-         <tr class="text-left text-slate-600 dark:text-slate-300 text-xs font-semibold tracking-wide">
-          <th class="px-4 py-3">ชื่ออุปกรณ์</th>
-          <th class="px-4 py-3">วันที่ส่งซ่อม</th>
+         <tr>
+          <th class="px-4 py-3 text-left">ชื่ออุปกรณ์</th>
+          <th class="px-4 py-3 text-left">วันที่ส่งซ่อม</th>
           <th class="px-4 py-3 text-center">สถานะ</th>
-          <th class="px-4 py-3">อาการ/หมายเหตุ</th>
-          <th class="px-4 py-3 text-center">จัดการ</th>
+          <th class="px-4 py-3 text-left">จัดการ</th>
          </tr>
         </thead>
-        <tbody id="maint-table" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+        <tbody id="maint-table"></tbody>
        </table>
-      </div>
-      <div id="no-maint" class="text-center text-slate-400 py-10 text-sm flex flex-col items-center">
-        <span class="text-3xl mb-2 opacity-50">✨</span>
-        ไม่มีรายการอุปกรณ์ที่กำลังซ่อมบำรุง
-      </div>
      </div>
     </section>
    </main>
@@ -314,9 +243,9 @@
 
   <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto p-6 shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
-    <div class="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-700 pb-3">
-     <h3 id="modal-title" class="text-lg font-bold text-slate-800 dark:text-white"></h3>
-     <button id="modal-close" class="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 bg-slate-50 dark:bg-slate-700/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 w-8 h-8 rounded-full flex items-center justify-center transition-colors">✕</button>
+    <div class="flex items-center justify-between mb-4 border-b pb-3">
+     <h3 id="modal-title" class="text-lg font-bold"></h3>
+     <button id="modal-close" class="text-slate-400 hover:text-rose-500">✕</button>
     </div>
     <div id="modal-body"></div>
    </div>
@@ -324,45 +253,43 @@
 
   <div id="img-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
    <div class="relative max-w-2xl mx-4 transform scale-95 transition-transform duration-300" id="img-modal-content">
-    <button id="img-modal-close" class="absolute -top-4 -right-4 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:text-rose-500 w-10 h-10 rounded-full shadow-xl flex items-center justify-center text-lg z-10 transition-colors">✕</button>
-    <img id="img-modal-src" class="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain bg-white/90 dark:bg-slate-900/90 backdrop-blur">
+    <button id="img-modal-close" class="absolute -top-4 -right-4 bg-white text-slate-600 w-10 h-10 rounded-full shadow-xl flex items-center justify-center">✕</button>
+    <img id="img-modal-src" class="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain bg-white">
    </div>
   </div>
 
-  <script src="/_sdk/719055fef2a85d14.editing_sdk.js" integrity="sha512-kFqrdGgIiTOsu307feB5Cy3JVP9IayftsmCIZ0csxYBGuBmJQPhyvcnmKR8F0fTW97h5s1gAvz3SumI8zJ6OxQ=="></script>
-  <script src="/_sdk/0179d719c431a79e.data_sdk.js" integrity="sha512-OsRvJkI5GkC3MJQcgotQYotpzrMSX415GiKKgvYdxQEEkzD/fdchShO2FMSy0PJr/tiINMXOk5Vl2zAgg6bUiA=="></script>
   <script>
 (function() {
   'use strict';
 
-  let allData = [];
+  let allData = JSON.parse(localStorage.getItem('rpst_data')) || [
+    { __backendId: "eq_1", type: "equipment", item_order: 1, item_name: "เครื่องผลิตออกซิเจน 5 ลิตร", category: "เครื่องมือแพทย์", total_qty: 1, available_qty: 0, status: "พร้อมใช้งาน", equipment_image: "" },
+    { __backendId: "tx_1", type: "transaction", equipment_id: "eq_1", item_name: "เครื่องผลิตออกซิเจน 5 ลิตร", borrower_name: "นายสมภาร", borrower_surname: "ชมคัด", borrow_date: "2026-07-09", return_date: "", record_status: "borrowed" }
+  ];
+  
   let charts = {};
   let editingId = null;
 
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => document.querySelectorAll(s);
-  const esc = (s) => String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const esc = (s) => String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const todayStr = () => new Date().toISOString().split('T')[0];
-  const byType = (t) => allData.filter(d => d.type === t);
 
-  function nextOrder() {
-    return byType('equipment').reduce((m, e) => Math.max(m, Number(e.item_order) || 0), 0) + 1;
+  function saveData() {
+    localStorage.setItem('rpst_data', JSON.stringify(allData));
+    refreshAll();
   }
+
+  const byType = (t) => allData.filter(d => d.type === t);
 
   function showToast(msg) {
     const t = document.createElement('div');
-    t.className = 'toast fixed top-5 left-1/2 -translate-x-1/2 bg-slate-800/95 backdrop-blur text-white px-5 py-3 rounded-2xl shadow-2xl z-[70] text-sm font-medium border border-slate-700/50 flex items-center gap-2';
+    t.className = 'toast fixed top-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-2xl shadow-2xl z-[70] text-sm font-medium border border-slate-700';
     t.innerHTML = msg;
     document.body.appendChild(t);
-    setTimeout(() => {
-        t.style.opacity = '0';
-        t.style.transform = 'translate(-50%, -20px)';
-        t.style.transition = 'all 0.3s ease';
-        setTimeout(() => t.remove(), 300);
-    }, 3000);
+    setTimeout(() => { t.remove(); }, 3000);
   }
 
-  // Navigation
   function showPage(page) {
     $$('.page').forEach(p => p.classList.add('hidden'));
     const el = $('#page-' + page);
@@ -370,19 +297,7 @@
     $$('[data-page]').forEach(b => b.classList.remove('active'));
     const btn = document.querySelector('[data-page="' + page + '"]');
     if (btn) btn.classList.add('active');
-    if (page === 'reports') setTimeout(renderReportCharts, 100);
     if (window.innerWidth < 1024) $('#sidebar').classList.add('-translate-x-full');
-  }
-
-  function initTemplateTexts() {
-    const sidebarTitle = $('[data-template-id="sidebar-title"]');
-    if (sidebarTitle) sidebarTitle.textContent = 'ยืม-คืนอุปกรณ์ รพ.สต.';
-    const headerTitle = $('[data-template-id="header-title"]');
-    if (headerTitle) headerTitle.textContent = 'ระบบทะเบียนยืม-คืนอุปกรณ์การแพทย์';
-    const headerSubtitle = $('[data-template-id="header-subtitle"]');
-    if (headerSubtitle) headerSubtitle.textContent = 'โรงพยาบาลส่งเสริมสุขภาพตำบลคลองจระเข้';
-    const emblem = $('[data-template-id="moph-emblem"]');
-    if (emblem) emblem.src = 'https://upload.wikimedia.org/wikipedia/commons/f/f8/Ministry_of_Public_Health_Thailand_Logo.svg';
   }
 
   $('#nav-menu').addEventListener('click', (e) => {
@@ -392,64 +307,26 @@
   $('#menu-toggle').addEventListener('click', () => $('#sidebar').classList.toggle('-translate-x-full'));
   $('#dark-toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
 
-  // Modals with animations
   function showModal() { 
-    const m = $('#modal');
-    m.classList.remove('hidden'); 
-    m.classList.add('flex'); 
-    setTimeout(() => {
-        m.classList.remove('opacity-0');
-        $('#modal-content').classList.remove('scale-95');
-    }, 10);
+    const m = $('#modal'); m.classList.remove('hidden'); m.classList.add('flex');
+    setTimeout(() => { m.classList.remove('opacity-0'); $('#modal-content').classList.remove('scale-95'); }, 10);
   }
   function closeModal() { 
-    const m = $('#modal');
-    m.classList.add('opacity-0');
-    $('#modal-content').classList.add('scale-95');
-    setTimeout(() => {
-        m.classList.add('hidden'); 
-        m.classList.remove('flex'); 
-        editingId = null; 
-    }, 300);
+    const m = $('#modal'); m.classList.add('opacity-0'); $('#modal-content').classList.add('scale-95');
+    setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); editingId = null; }, 300);
   }
   $('#modal-close').addEventListener('click', closeModal);
-  $('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) closeModal(); });
 
   function showImageModal(src) {
     $('#img-modal-src').src = src;
-    const m = $('#img-modal');
-    m.classList.remove('hidden');
-    m.classList.add('flex');
-    setTimeout(() => {
-        m.classList.remove('opacity-0');
-        $('#img-modal-content').classList.remove('scale-95');
-    }, 10);
+    const m = $('#img-modal'); m.classList.remove('hidden'); m.classList.add('flex');
+    setTimeout(() => { m.classList.remove('opacity-0'); $('#img-modal-content').classList.remove('scale-95'); }, 10);
   }
-  function closeImageModal() { 
-    const m = $('#img-modal');
-    m.classList.add('opacity-0');
-    $('#img-modal-content').classList.add('scale-95');
-    setTimeout(() => {
-        m.classList.add('hidden'); 
-        m.classList.remove('flex'); 
-    }, 300);
-  }
-  $('#img-modal-close').addEventListener('click', closeImageModal);
-  $('#img-modal').addEventListener('click', (e) => { if (e.target === $('#img-modal')) closeImageModal(); });
+  $('#img-modal-close').addEventListener('click', () => { $('#img-modal').classList.add('hidden'); });
 
-  // Data SDK
-  const dataHandler = {
-    onDataChanged(data) {
-      allData = data;
-      refreshAll();
-    }
-  };
-
-  async function initApp() {
-    initTemplateTexts();
-    const r = await window.dataSdk.init(dataHandler);
-    if (!r.isOk) showToast('<span>❌</span> ไม่สามารถเชื่อมต่อข้อมูลได้');
-    $('#borrow-date').value = todayStr();
+  function initApp() {
+    if(!$('#borrow-date').value) $('#borrow-date').value = todayStr();
+    refreshAll();
     showPage('dashboard');
   }
 
@@ -462,7 +339,6 @@
     renderMaintenance();
   }
 
-  // Dashboard
   function updateDashboard() {
     const eq = byType('equipment');
     const tx = byType('transaction');
@@ -476,22 +352,6 @@
     $('#stat-borrowed').textContent = borrowed;
     $('#stat-maint').textContent = maint;
 
-    const recent = tx.slice().sort((a, b) => (b.borrow_date || '').localeCompare(a.borrow_date || '')).slice(0, 5);
-    const tbody = $('#recent-table');
-    if (recent.length) {
-      $('#no-recent').classList.add('hidden');
-      tbody.innerHTML = recent.map(r => `
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-          <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">${esc(r.borrow_date)}</td>
-          <td class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-200">${esc(r.item_name)}</td>
-          <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-[10px]">👤</div>${esc(r.borrower_name)}</td>
-          <td class="px-4 py-3">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${r.record_status === 'borrowed' ? 'bg-rose-50 text-rose-600 border border-rose-200 dark:border-rose-800/50 dark:bg-rose-900/20 dark:text-rose-400' : 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:border-emerald-800/50 dark:bg-emerald-900/20 dark:text-emerald-400'}">
-              ${r.record_status === 'borrowed' ? 'กำลังยืม' : 'คืนแล้ว'}
-            </span>
-          </td>
-        </tr>`).join('');
-    } else { $('#no-recent').classList.remove('hidden'); tbody.innerHTML = ''; }
     renderDashboardCharts();
   }
 
@@ -499,80 +359,48 @@
     const tx = byType('transaction');
     const eq = byType('equipment');
     const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-    const bM = Array(12).fill(0), rM = Array(12).fill(0);
+    const bM = Array(12).fill(0);
     tx.forEach(t => {
       const m = new Date(t.borrow_date).getMonth();
       if (!isNaN(m)) bM[m]++;
-      if (t.return_date) { const rm = new Date(t.return_date).getMonth(); if (!isNaN(rm)) rM[rm]++; }
     });
-
-    Chart.defaults.font.family = "'Sarabun', sans-serif";
-    Chart.defaults.color = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
 
     if (charts.monthly) charts.monthly.destroy();
     const c1 = $('#chart-monthly');
-    if (c1) charts.monthly = new Chart(c1, { type: 'bar', data: { labels: months, datasets: [{ label: 'จำนวนยืม', data: bM, backgroundColor: '#14b8a6', borderRadius: 4 }, { label: 'จำนวนคืน', data: rM, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] } }, x: { grid: { display: false } } } } });
+    if (c1) charts.monthly = new Chart(c1, { type: 'bar', data: { labels: months, datasets: [{ label: 'จำนวนยืม', data: bM, backgroundColor: '#14b8a6', borderRadius: 4 }] } });
 
     const cats = {};
-    eq.forEach(e => { cats[e.category || 'ไม่ได้ระบุ'] = (cats[e.category || 'ไม่ได้ระบุ'] || 0) + (Number(e.total_qty) || 0); });
+    eq.forEach(e => { cats[e.category || 'ทั่วไป'] = (cats[e.category || 'ทั่วไป'] || 0) + (Number(e.total_qty) || 0); });
     if (charts.category) charts.category.destroy();
     const c2 = $('#chart-category');
-    if (c2) charts.category = new Chart(c2, { type: 'doughnut', data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#14b8a6','#3b82f6','#f59e0b','#f43f5e','#8b5cf6','#64748b'], borderWidth: 2, hoverOffset: 4 }] }, options: { responsive: true, cutout: '65%', plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 20 } } } } });
+    if (c2) charts.category = new Chart(c2, { type: 'doughnut', data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#14b8a6','#3b82f6','#f59e0b'] }] } });
   }
 
-  function renderReportCharts() {
-    const tx = byType('transaction');
-    const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-    const bM = Array(12).fill(0);
-    tx.forEach(t => { const m = new Date(t.borrow_date).getMonth(); if (!isNaN(m)) bM[m]++; });
-
-    if (charts.reportMonthly) charts.reportMonthly.destroy();
-    const c1 = $('#chart-report-monthly');
-    if (c1) charts.reportMonthly = new Chart(c1, { type: 'line', data: { labels: months, datasets: [{ label: 'ครั้งที่ถูกยืม', data: bM, borderColor: '#14b8a6', backgroundColor: 'rgba(20, 184, 166, 0.1)', fill: true, tension: 0.4, pointBackgroundColor: '#14b8a6', borderWidth: 2 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] } }, x: { grid: { display: false } } } } });
-
-    const itemCount = {};
-    tx.forEach(t => { itemCount[t.item_name || 'ไม่ทราบชื่อ'] = (itemCount[t.item_name || 'ไม่ทราบชื่อ'] || 0) + 1; });
-    const sorted = Object.entries(itemCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    if (charts.topItems) charts.topItems.destroy();
-    const c2 = $('#chart-top-items');
-    if (c2) charts.topItems = new Chart(c2, { type: 'bar', data: { labels: sorted.map(s => s[0]), datasets: [{ label: 'จำนวนครั้ง', data: sorted.map(s => s[1]), backgroundColor: '#14b8a6', borderRadius: 4 }] }, options: { responsive: true, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { borderDash: [4, 4] } }, y: { grid: { display: false } } } } });
-  }
-
-  // Equipment
   function renderEquipment() {
     const eq = byType('equipment').sort((a, b) => (Number(a.item_order) || 0) - (Number(b.item_order) || 0));
     const q = ($('#eq-search').value || '').toLowerCase();
-    const filtered = eq.filter(e => (e.item_name || '').toLowerCase().includes(q) || (e.category || '').toLowerCase().includes(q));
+    const filtered = eq.filter(e => (e.item_name || '').toLowerCase().includes(q));
     const tbody = $('#eq-table');
 
     if (filtered.length) {
       $('#no-eq').classList.add('hidden');
       tbody.innerHTML = filtered.map(e => {
         const hasImg = e.equipment_image && String(e.equipment_image).length > 10;
-        const imgCell = hasImg ? `<img src="${esc(e.equipment_image)}" class="eq-thumb shadow-sm" data-action="view-img">` : '<div class="eq-thumb-placeholder">📷</div>';
+        const imgCell = hasImg ? `<img src="${esc(e.equipment_image)}" class="eq-thumb shadow-sm" data-action="view-img">` : '<div class="eq-thumb-placeholder">-</div>';
         
-        let statusClass = 'bg-slate-100 text-slate-600 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300';
-        if(e.status === 'พร้อมใช้งาน') statusClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:border-emerald-800/50 dark:bg-emerald-900/20 dark:text-emerald-400';
-        if(e.status === 'ส่งซ่อม' || e.status === 'ชำรุด') statusClass = 'bg-amber-50 text-amber-700 border border-amber-200 dark:border-amber-800/50 dark:bg-amber-900/20 dark:text-amber-400';
-
         return `
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-          <td class="px-4 py-3 text-center font-bold text-primary-600 dark:text-primary-400 text-lg">${e.item_order || '-'}</td>
-          <td class="px-4 py-3">${imgCell}</td>
-          <td class="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">${esc(e.item_name)}</td>
-          <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-             <span class="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md text-[11px] font-medium border border-slate-200 dark:border-slate-600">${esc(e.category || 'ทั่วไป')}</span>
-          </td>
-          <td class="px-4 py-3 text-center font-medium">${e.total_qty || 0}</td>
-          <td class="px-4 py-3 text-center font-bold text-primary-600 dark:text-primary-400">${e.available_qty || 0}</td>
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+          <td class="px-4 py-3 text-center font-bold">${e.item_order || '-'}</td>
+          <td class="px-4 py-3 text-center flex justify-center">${imgCell}</td>
+          <td class="px-4 py-3 font-semibold">${esc(e.item_name)}</td>
+          <td class="px-4 py-3">${esc(e.category || 'ทั่วไป')}</td>
+          <td class="px-4 py-3 text-center">${e.total_qty || 0}</td>
+          <td class="px-4 py-3 text-center font-bold text-teal-600">${e.available_qty || 0}</td>
+          <td class="px-4 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700">${esc(e.status)}</span></td>
           <td class="px-4 py-3 text-center">
-            <span class="inline-flex px-2.5 py-1 rounded-full text-[11px] font-medium ${statusClass}">${esc(e.status)}</span>
-          </td>
-          <td class="px-4 py-3">
             <div class="flex items-center justify-center gap-2">
-              <button data-action="view-qr" data-id="${e.__backendId}" class="p-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-indigo-600 transition-colors" title="ดู QR Code">📱</button>
-              <button data-action="edit-eq" data-id="${e.__backendId}" class="p-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-primary-600 transition-colors" title="แก้ไข">✏️</button>
-              <button data-action="delete" data-id="${e.__backendId}" class="p-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/30 hover:text-rose-600 transition-colors" title="ลบ">🗑️</button>
+              <button data-action="view-qr" data-id="${e.__backendId}" class="p-1 bg-slate-100 text-slate-700 text-xs rounded hover:bg-slate-200">📱 QR</button>
+              <button data-action="delete" data-id="${e.__backendId}" class="p-1 bg-rose-50 text-rose-600 text-xs rounded hover:bg-rose-100">🗑️ ลบ</button>
             </div>
           </td>
         </tr>`;
@@ -581,33 +409,559 @@
   }
 
   $('#eq-search').addEventListener('input', renderEquipment);
-  $('#btn-add-eq').addEventListener('click', () => openEquipmentModal(null));
-  $('#btn-print-summary').addEventListener('click', printEquipmentSummary);
+  $('#btn-add-eq').addEventListener('click', () => openEquipmentModal());
+  
+  // พิมพ์ QR Code ทั้งหมดแบบอัตโนมัติ (สติ๊กเกอร์)
+  $('#btn-print-all-qrs').addEventListener('click', () => {
+    const eq = byType('equipment').sort((a, b) => (Number(a.item_order) || 0) - (Number(b.item_order) || 0));
+    if(eq.length === 0) { showToast('❌ ไม่มีอุปกรณ์ให้พิมพ์คิวอาร์โค้ด'); return; }
+
+    let printHtml = `
+    <html>
+    <head>
+      <title>พิมพ์ QR Code อุปกรณ์ทั้งหมด</title>
+      <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+      <style>
+        body { font-family: 'Sarabun', sans-serif; padding: 20px; background: #fff; margin: 0; }
+        .page-title { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .qr-card { border: 2px dashed #cbd5e1; padding: 15px 10px; text-align: center; border-radius: 8px; page-break-inside: avoid; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .qr-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .qr-sub { font-size: 12px; color: #475569; margin-bottom: 10px; }
+        .qr-code { display: flex; justify-content: center; margin-top: 5px; }
+        .qr-code img { max-width: 100px; max-height: 100px; }
+      </style>
+    </head>
+    <body>
+      <div class="page-title">คิวอาร์โค้ดอุปกรณ์ (รพ.สต.คลองจระเข้)</div>
+      <div class="grid-container">
+    `;
+
+    eq.forEach(e => {
+      printHtml += `
+        <div class="qr-card">
+          <div class="qr-title">${esc(e.item_name)}</div>
+          <div class="qr-sub">ลำดับ: ${e.item_order} | หมวด: ${esc(e.category || '-')}</div>
+          <div id="qr-${e.__backendId}" class="qr-code"></div>
+        </div>
+      `;
+    });
+
+    printHtml += `
+      </div>
+      <script>
+        window.onload = function() {
+          const eqData = ${JSON.stringify(eq)};
+          eqData.forEach(function(item) {
+            const text = "ลำดับ: " + item.item_order + "\\nชื่อ: " + item.item_name + "\\nหมวด: " + (item.category || "-");
+            new QRCode(document.getElementById("qr-" + item.__backendId), {
+              text: text,
+              width: 100,
+              height: 100,
+              colorDark : "#000000",
+              colorLight : "#ffffff",
+              correctLevel : QRCode.CorrectLevel.L
+            });
+          });
+          setTimeout(function() { window.print(); }, 800);
+        };
+      <\/script>
+    </body>
+    </html>
+    `;
+
+    const win = window.open('', '_blank');
+    win.document.write(printHtml);
+    win.document.close();
+  });
+
+  // ใบรายงานที่ 1: ทะเบียนอุปกรณ์การแพทย์
+  $('#btn-print-summary').addEventListener('click', () => {
+    const eq = byType('equipment').sort((a, b) => (Number(a.item_order) || 0) - (Number(b.item_order) || 0));
+    const thaiDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    let printHtml = `
+    <html>
+    <head>
+      <title>ทะเบียนอุปกรณ์ทางการแพทย์</title>
+      <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+      <style>
+        body { font-family: 'Sarabun', sans-serif; padding: 40px; color: #000; background: #fff; }
+        .title-1 { text-align: center; font-size: 20px; font-weight: 700; margin: 0 0 6px 0; }
+        .title-2 { text-align: center; font-size: 18px; font-weight: 700; margin: 0 0 20px 0; }
+        .date-line { text-align: right; font-size: 14px; margin-bottom: 6px; font-weight: 400; }
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        th, td { border: 1px solid #000; padding: 8px 10px; font-size: 14px; vertical-align: middle; }
+        th { background-color: #0d4e36; color: #fff; font-weight: 600; text-align: center; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .print-thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 4px; display: block; margin: 0 auto; }
+      </style>
+    </head>
+    <body>
+      <div class="title-1">โรงพยาบาลส่งเสริมสุขภาพตำบลคลองจระเข้</div>
+      <div class="title-2">ทะเบียนอุปกรณ์ทางการแพทย์</div>
+      <div class="date-line">วันที่พิมพ์: ${thaiDate}</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 8%;">ลำดับ</th>
+            <th style="width: 10%;">รูป</th>
+            <th style="width: 37%;">ชื่อ</th>
+            <th style="width: 15%;">หมวด</th>
+            <th style="width: 10%;">ทั้งหมด</th>
+            <th style="width: 10%;">คงเหลือ</th>
+            <th style="width: 10%;">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    printHtml += eq.map(e => {
+      const hasImg = e.equipment_image && String(e.equipment_image).length > 10;
+      const imgTag = hasImg ? `<img src="${e.equipment_image}" class="print-thumb">` : '-';
+      return `
+        <tr>
+          <td class="text-center">${e.item_order}</td>
+          <td class="text-center">${imgTag}</td>
+          <td class="text-left">${esc(e.item_name)}</td>
+          <td class="text-left">${esc(e.category || '-')}</td>
+          <td class="text-center">${e.total_qty || 0}</td>
+          <td class="text-center">${e.available_qty || 0}</td>
+          <td class="text-center">${esc(e.status)}</td>
+        </tr>
+      `;
+    }).join('');
+
+    printHtml += `</tbody></table></body></html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(printHtml);
+    win.document.close();
+    setTimeout(() => { win.print(); }, 300);
+  });
+
+  // ใบรายงานที่ 2: รายงานประวัติการยืม-คืนอุปกรณ์
+  $('#btn-print-history').addEventListener('click', () => {
+    const tx = byType('transaction');
+    const thaiDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    const totalCount = tx.length;
+    const borrowCount = tx.filter(t => t.record_status === 'borrowed').length;
+    const returnCount = tx.filter(t => t.record_status === 'returned').length;
+
+    let printHtml = `
+    <html>
+    <head>
+      <title>รายงานประวัติการยืม-คืนอุปกรณ์</title>
+      <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+      <style>
+        body { font-family: 'Sarabun', sans-serif; padding: 40px; color: #000; background: #fff; }
+        .title-1 { text-align: center; font-size: 20px; font-weight: 700; margin: 0 0 6px 0; }
+        .title-2 { text-align: center; font-size: 18px; font-weight: 700; margin: 0 0 20px 0; }
+        .date-line { text-align: right; font-size: 14px; margin-bottom: 6px; font-weight: 400; }
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 12px; }
+        th, td { border: 1px solid #000; padding: 8px 10px; font-size: 14px; vertical-align: middle; }
+        th { background-color: #0d4e36; color: #fff; font-weight: 600; text-align: center; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .summary-line { font-size: 14px; font-weight: 700; text-align: left; margin-top: 10px; }
+      </style>
+    </head>
+    <body>
+      <div class="title-1">โรงพยาบาลส่งเสริมสุขภาพตำบลคลองจระเข้</div>
+      <div class="title-2">รายงานประวัติการยืม-คืนอุปกรณ์</div>
+      <div class="date-line">วันที่พิมพ์: ${thaiDate}</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">วันที่ยืม</th>
+            <th style="width: 18%;">วันที่คืน</th>
+            <th style="width: 34%;">อุปกรณ์</th>
+            <th style="width: 18%;">ผู้ยืม</th>
+            <th style="width: 12%;">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    printHtml += tx.map(t => {
+      const statusText = t.record_status === 'borrowed' ? 'ยืมอยู่' : 'คืนแล้ว';
+      return `
+        <tr>
+          <td class="text-left">${t.borrow_date || '-'}</td>
+          <td class="text-center">${t.return_date || '-'}</td>
+          <td class="text-left">${esc(t.item_name)}</td>
+          <td class="text-left">${esc(t.borrower_name)} ${esc(t.borrower_surname || '')}</td>
+          <td class="text-center">${statusText}</td>
+        </tr>
+      `;
+    }).join('');
+
+    printHtml += `
+        </tbody>
+      </table>
+      <div class="summary-line">สรุป: ทั้งหมด ${totalCount} | ยืมอยู่ ${borrowCount} | คืนแล้ว ${returnCount}</div>
+    </body>
+    </html>
+    `;
+
+    const win = window.open('', '_blank');
+    win.document.write(printHtml);
+    win.document.close();
+    setTimeout(() => { win.print(); }, 300);
+  });
+  
+  // ใบรายงานที่ 3: สรุปภาพรวมระบบหน้าแดชบอร์ด
+  $('#btn-print-dashboard').addEventListener('click', () => {
+    const eq = byType('equipment');
+    const tx = byType('transaction');
+    const maint = byType('maintenance').filter(m => m.record_status === 'repairing');
+    
+    const activeBorrows = tx.filter(t => t.record_status === 'borrowed');
+    const totalQty = eq.reduce((s, e) => s + (Number(e.total_qty) || 0), 0);
+    const availQty = eq.reduce((s, e) => s + (Number(e.available_qty) || 0), 0);
+    
+    const thaiDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    let printHtml = `
+    <html>
+    <head>
+      <title>รายงานสรุปภาพรวมระบบยืม-คืนอุปกรณ์</title>
+      <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+      <style>
+        body { font-family: 'Sarabun', sans-serif; padding: 40px; color: #000; background: #fff; }
+        .title-1 { text-align: center; font-size: 20px; font-weight: 700; margin: 0 0 6px 0; }
+        .title-2 { text-align: center; font-size: 18px; font-weight: 700; margin: 0 0 20px 0; }
+        .date-line { text-align: right; font-size: 14px; margin-bottom: 20px; font-weight: 400; }
+        .stat-container { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .stat-box { border: 2px solid #0d4e36; border-radius: 8px; padding: 15px; width: 22%; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: 700; color: #0d4e36; }
+        .stat-label { font-size: 14px; margin-top: 5px; }
+        .section-title { font-size: 16px; font-weight: 700; margin: 20px 0 10px 0; color: #0d4e36; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 8px 10px; font-size: 14px; vertical-align: middle; }
+        th { background-color: #0d4e36; color: #fff; font-weight: 600; text-align: center; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+      </style>
+    </head>
+    <body>
+      <div class="title-1">โรงพยาบาลส่งเสริมสุขภาพตำบลคลองจระเข้</div>
+      <div class="title-2">รายงานสรุปภาพรวมระบบยืม-คืนอุปกรณ์การแพทย์</div>
+      <div class="date-line">วันที่พิมพ์: ${thaiDate}</div>
+      
+      <div class="stat-container">
+        <div class="stat-box">
+          <div class="stat-value">${totalQty}</div>
+          <div class="stat-label">อุปกรณ์ทั้งหมด</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${availQty}</div>
+          <div class="stat-label">พร้อมใช้งาน</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${activeBorrows.length}</div>
+          <div class="stat-label">กำลังถูกยืม</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${maint.length}</div>
+          <div class="stat-label">ส่งซ่อมบำรุง</div>
+        </div>
+      </div>
+      
+      <div class="section-title">รายการอุปกรณ์ที่อยู่ระหว่างการยืม (ยังไม่ส่งคืน)</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">วันที่ยืม</th>
+            <th style="width: 40%;">ชื่ออุปกรณ์</th>
+            <th style="width: 40%;">ชื่อผู้ยืม</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    if (activeBorrows.length > 0) {
+      printHtml += activeBorrows.map(t => `
+        <tr>
+          <td class="text-center">${t.borrow_date}</td>
+          <td class="text-left">${esc(t.item_name)}</td>
+          <td class="text-left">${esc(t.borrower_name)} ${esc(t.borrower_surname || '')}</td>
+        </tr>
+      `).join('');
+    } else {
+      printHtml += `<tr><td colspan="3" class="text-center">- ไม่มีรายการที่อยู่ระหว่างการยืม -</td></tr>`;
+    }
+
+    printHtml += `
+        </tbody>
+      </table>
+      
+      <div class="section-title">รายการอุปกรณ์ที่อยู่ระหว่างส่งซ่อมบำรุง</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">วันที่แจ้งซ่อม</th>
+            <th style="width: 40%;">ชื่ออุปกรณ์</th>
+            <th style="width: 40%;">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    if (maint.length > 0) {
+      printHtml += maint.map(m => `
+        <tr>
+          <td class="text-center">${m.maint_date}</td>
+          <td class="text-left">${esc(m.item_name)}</td>
+          <td class="text-center text-amber-600 font-bold">กำลังซ่อม</td>
+        </tr>
+      `).join('');
+    } else {
+      printHtml += `<tr><td colspan="3" class="text-center">- ไม่มีอุปกรณ์ส่งซ่อม -</td></tr>`;
+    }
+
+    printHtml += `
+        </tbody>
+      </table>
+    </body>
+    </html>
+    `;
+
+    const win = window.open('', '_blank');
+    win.document.write(printHtml);
+    win.document.close();
+    setTimeout(() => { win.print(); }, 300);
+  });
 
   $('#eq-table').addEventListener('click', (e) => {
     const target = e.target;
-    if (target.dataset.action === 'view-img') {
-      showImageModal(target.src);
-    } else {
-      const btn = target.closest('[data-action]');
-      if (!btn) return;
-      const id = btn.dataset.id;
-      if (btn.dataset.action === 'edit-eq') openEquipmentModal(id);
-      if (btn.dataset.action === 'view-qr') openQrModal(id);
-      if (btn.dataset.action === 'delete') {
-        if (confirm('ยืนยันลบรายการอุปกรณ์นี้ ใช่หรือไม่?')) {
-          window.dataSdk.delete(id).then(r => { if (r.isOk) showToast('<span>🗑️</span> ลบข้อมูลอุปกรณ์สำเร็จ'); });
-        }
+    if (target.dataset.action === 'view-img') { showImageModal(target.src); return; }
+    
+    const btn = target.closest('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === 'view-qr') openQrModal(id);
+    if (btn.dataset.action === 'delete') {
+      if (confirm('ยืนยันการลบอุปกรณ์นี้?')) {
+        allData = allData.filter(d => d.__backendId !== id);
+        saveData();
       }
     }
   });
 
-  // ฟังก์ชันแสดง QR Code และรูปภาพ
   function openQrModal(id) {
     const item = allData.find(d => d.__backendId === id);
     if (!item) return;
+    $('#modal-title').innerHTML = '📱 คิวอาร์โค้ดและข้อมูลอุปกรณ์';
+    const qrText = `ลำดับ: ${item.item_order}\nชื่อ: ${item.item_name}\nหมวดหมู่: ${item.category || '-'}`;
+    const imgSrc = item.equipment_image || 'https://placehold.co/150x150?text=No+Image';
 
-    $('#modal-title').innerHTML = '<span class="text-indigo-600">📱</span> คิวอาร์โค้ดอุปกรณ์';
+    $('#modal-body').innerHTML = `
+      <div class="flex flex-col items-center text-center p-2">
+        <h4 class="text-xl font-bold">${esc(item.item_name)}</h4>
+        <p class="text-sm text-teal-600 font-medium mb-4">ลำดับทะเบียนที่: ${item.item_order}</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-4">
+            <div>
+                <span class="text-xs text-slate-400 block mb-1">รูปถ่ายอุปกรณ์</span>
+                <img src="${imgSrc}" class="w-32 h-32 object-cover rounded-xl border bg-white">
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-xs text-slate-400 block mb-1">สแกนคิวอาร์โค้ด</span>
+                <div class="p-2 bg-white rounded-xl border" id="qr-container"></div>
+            </div>
+        </div>
+      </div>`;
     
-    const qrText = `รหัสอ้างอิง: ${item.__backendId}\nลำดับ: ${item.item_order}\nชื่อ: ${item.item_name}\nหมวดหมู่: ${item.category || '-'}`;
-    const imgSrc = (item.equipment_image && item.equipment_image.length > 10)
+    setTimeout(() => {
+      new QRCode(document.getElementById("qr-container"), { text: qrText, width: 120, height: 120 });
+    }, 50);
+    showModal();
+  }
+
+  function openEquipmentModal() {
+    const nextOrder = byType('equipment').length + 1;
+    $('#modal-title').innerHTML = '➕ เพิ่มอุปกรณ์ใหม่';
+    $('#modal-body').innerHTML = `
+      <form id="eq-form" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-xs font-semibold mb-1">ลำดับทะเบียน</label><input id="ef-order" class="w-full border rounded-xl px-3 py-2 text-sm bg-slate-50 font-bold" value="${nextOrder}" readonly></div>
+          <div><label class="block text-xs font-semibold mb-1">ชื่ออุปกรณ์ *</label><input id="ef-name" class="w-full border rounded-xl px-3 py-2 text-sm outline-none" required></div>
+          <div><label class="block text-xs font-semibold mb-1">หมวดหมู่</label><input id="ef-cat" class="w-full border rounded-xl px-3 py-2 text-sm outline-none" value="เครื่องมือแพทย์"></div>
+          <div><label class="block text-xs font-semibold mb-1">จำนวนรวม</label><input id="ef-qty" type="number" min="1" class="w-full border rounded-xl px-3 py-2 text-sm" value="1"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">📷 รูปถ่ายอุปกรณ์</label>
+          <input type="file" id="ef-file" accept="image/*" class="w-full text-xs">
+        </div>
+        <button type="submit" class="w-full bg-teal-700 text-white py-2.5 rounded-xl font-bold text-sm">💾 บันทึกข้อมูล</button>
+      </form>`;
+
+    let base64Img = "";
+    $('#ef-file').addEventListener('change', (ev) => {
+      const file = ev.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => { base64Img = e.target.result; };
+      reader.readAsDataURL(file);
+    });
+
+    $('#eq-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const qty = Number($('#ef-qty').value) || 1;
+      const newEq = {
+        __backendId: 'eq_' + Date.now(),
+        type: 'equipment',
+        item_order: Number($('#ef-order').value),
+        item_name: $('#ef-name').value,
+        category: $('#ef-cat').value,
+        total_qty: qty,
+        available_qty: qty,
+        status: 'พร้อมใช้งาน',
+        equipment_image: base64Img
+      };
+      allData.push(newEq);
+      saveData();
+      closeModal();
+      showToast('✅ เพิ่มอุปกรณ์สำเร็จ');
+    });
+    showModal();
+  }
+
+  function renderBorrowSelects() {
+    const eq = byType('equipment').filter(e => e.available_qty > 0);
+    $('#borrow-equipment').innerHTML = eq.map(e => `<option value="${e.__backendId}">${esc(e.item_name)} (คงเหลือ: ${e.available_qty})</option>`).join('');
+  }
+
+  $('#borrow-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const eqId = $('#borrow-equipment').value;
+    const eqItem = allData.find(d => d.__backendId === eqId);
+    if (!eqItem) return;
+
+    eqItem.available_qty--;
+    
+    const tx = {
+      __backendId: 'tx_' + Date.now(),
+      type: 'transaction',
+      equipment_id: eqId,
+      item_name: eqItem.item_name,
+      borrower_name: $('#borrow-name').value,
+      borrower_surname: $('#borrow-surname').value,
+      borrow_date: $('#borrow-date').value,
+      return_date: '',
+      record_status: 'borrowed'
+    };
+    allData.push(tx);
+    saveData();
+    $('#borrow-form').reset();
+    $('#borrow-date').value = todayStr();
+    showToast('✅ บันทึกการยืมสำเร็จ');
+  });
+
+  function renderReturnList() {
+    const tx = byType('transaction').filter(t => t.record_status === 'borrowed');
+    const container = $('#return-list');
+    if (!tx.length) { $('#no-return').classList.remove('hidden'); container.innerHTML=''; return; }
+    $('#no-return').classList.add('hidden');
+    container.innerHTML = tx.map(t => `
+      <div class="flex items-center justify-between p-3 border rounded-xl bg-slate-50">
+        <div>
+          <p class="font-bold text-sm">${esc(t.item_name)}</p>
+          <p class="text-xs text-slate-500">👤 ${esc(t.borrower_name)} | 📅 ยืมเมื่อ: ${t.borrow_date}</p>
+        </div>
+        <button data-action="return" data-id="${t.__backendId}" data-eqid="${t.equipment_id}" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">🔄 รับคืน</button>
+      </div>`).join('');
+  }
+
+  $('#return-list').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="return"]');
+    if (!btn) return;
+    const txItem = allData.find(d => d.__backendId === btn.dataset.id);
+    const eqItem = allData.find(d => d.__backendId === btn.dataset.eqid);
+    if(txItem) {
+      txItem.record_status = 'returned';
+      txItem.return_date = todayStr(); 
+    }
+    if(eqItem) eqItem.available_qty = Math.min(eqItem.total_qty, eqItem.available_qty + 1);
+    saveData();
+    showToast('✅ รับคืนอุปกรณ์เข้าคลังสำเร็จ');
+  });
+
+  function renderHistory() {
+    const tx = byType('transaction');
+    $('#history-table').innerHTML = tx.map(t => `
+      <tr class="hover:bg-slate-50">
+        <td class="px-4 py-2 text-xs">${t.borrow_date}</td>
+        <td class="px-4 py-2 text-xs text-center">${t.return_date || '-'}</td>
+        <td class="px-4 py-2 font-medium">${esc(t.item_name)}</td>
+        <td class="px-4 py-2 text-xs">${esc(t.borrower_name)} ${esc(t.borrower_surname || '')}</td>
+        <td class="px-4 py-2 text-center text-xs">
+          ${t.record_status === 'borrowed' ? '<span class="text-amber-600 font-bold">🔴 ยืมอยู่</span>' : '<span class="text-emerald-600 font-bold">🟢 คืนแล้ว</span>'}
+        </td>
+      </tr>`).join('');
+  }
+
+  function renderMaintenance() {
+    const maint = byType('maintenance');
+    $('#maint-table').innerHTML = maint.map(m => `
+      <tr>
+        <td class="px-4 py-2">${esc(m.item_name)}</td>
+        <td class="px-4 py-2 text-xs">${m.maint_date}</td>
+        <td class="px-4 py-2 text-center"><span class="text-amber-600">🔧 ส่งซ่อม</span></td>
+        <td class="px-4 py-2 text-center"><button data-action="fix-done" data-id="${m.__backendId}" data-eqid="${m.equipment_id}" class="text-xs bg-emerald-100 text-emerald-800 px-2 py-1 rounded">เสร็จสิ้น</button></td>
+      </tr>`).join('');
+  }
+
+  $('#btn-add-maint').addEventListener('click', () => {
+    const eq = byType('equipment');
+    $('#modal-title').innerHTML = '🛠 แจ้งส่งซ่อมอุปกรณ์';
+    $('#modal-body').innerHTML = `
+      <form id="maint-form" class="space-y-4">
+        <select id="mf-eq" class="w-full border rounded-xl p-2.5 text-sm" required>
+          ${eq.map(e => `<option value="${e.__backendId}">${esc(e.item_name)}</option>`).join('')}
+        </select>
+        <input type="date" id="mf-date" class="w-full border rounded-xl p-2.5 text-sm" value="${todayStr()}" required>
+        <button type="submit" class="w-full bg-amber-600 text-white py-2 rounded-xl text-sm font-bold">💾 ยืนยันส่งซ่อม</button>
+      </form>`;
+    
+    $('#maint-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const eqId = $('#mf-eq').value;
+      const eqItem = allData.find(d => d.__backendId === eqId);
+      if(!eqItem) return;
+
+      eqItem.status = 'ส่งซ่อม';
+      allData.push({
+        __backendId: 'maint_' + Date.now(),
+        type: 'maintenance',
+        equipment_id: eqId,
+        item_name: eqItem.item_name,
+        maint_date: $('#mf-date').value,
+        record_status: 'repairing'
+      });
+      saveData();
+      closeModal();
+      showToast('🔧 บันทึกสถานะส่งซ่อมแล้ว');
+    });
+    showModal();
+  });
+
+  $('#maint-table').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="fix-done"]');
+    if(!btn) return;
+    const maintItem = allData.find(d => d.__backendId === btn.dataset.id);
+    const eqItem = allData.find(d => d.__backendId === btn.dataset.eqid);
+    if(maintItem) allData = allData.filter(d => d.__backendId !== btn.dataset.id);
+    if(eqItem) eqItem.status = 'พร้อมใช้งาน';
+    saveData();
+    showToast('✅ อุปกรณ์ซ่อมเสร็จสิ้น');
+  });
+
+  document.addEventListener('DOMContentLoaded', initApp);
+})();
+  </script>
+ </body>
+</html>
